@@ -17,8 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.io.IOException;
 import java.util.Map;
+
 
 @Service
 public class ReclamacaoService {
@@ -39,7 +43,6 @@ public class ReclamacaoService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    @Transactional
     public ReclamacaoResponse criar(
             ReclamacaoRequest request,
             MultipartFile foto,
@@ -126,4 +129,96 @@ public class ReclamacaoService {
             );
         }
     }
+
+    @Transactional(readOnly = true)
+    public Page<ReclamacaoResponse> listarTodas(Pageable pageable) {
+        return reclamacaoRepository.findAllByOrderByDataCriacaoDesc(pageable)
+                .stream()
+                .map(ReclamacaoResponse::de);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReclamacaoResponse> listarPorUsuario(Long usuarioId,  Pageable pageable) {
+        return reclamacaoRepository.findByUsuarioIdOrderByDataCriacaoDesc(usuarioId, pageable)
+                .stream()
+                .map(ReclamacaoResponse::de);
+    }
+
+
+    // ==========================================
+    // DELETAR RECLAMAÇÃO (USUÁRIO E ADMIN)
+    // ==========================================
+
+    @Transactional
+    public void deletarPeloUsuario(Long id, Long usuarioId) {
+        Reclamacao reclamacao = reclamacaoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
+
+        // Garante que um usuário não consiga apagar reclamações postadas por outros usuários
+        if (!reclamacao.getUsuario().getId().equals(usuarioId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você só pode apagar suas próprias reclamações.");
+        }
+
+        apagarDoCloudinaryEPostgres(reclamacao);
+    }
+
+    @Transactional
+    public void deletarPeloAdmin(Long id, Long adminId) {
+        Reclamacao reclamacao = reclamacaoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
+
+        Usuario admin = usuarioRepository.findById(adminId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getTipo())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado. Apenas administradores podem realizar esta ação.");
+        }
+
+        apagarDoCloudinaryEPostgres(reclamacao);
+    }
+
+    private void apagarDoCloudinaryEPostgres(Reclamacao reclamacao) {
+        String publicId = extrairPublicId(reclamacao.getFotoUrl());
+
+        try {
+            if (publicId != null) {
+                cloudinary.uploader().destroy(publicId, com.cloudinary.utils.ObjectUtils.emptyMap());
+            }
+        } catch (java.io.IOException e) {
+            System.err.println("Erro ao deletar imagem do Cloudinary: " + e.getMessage());
+        }
+
+        reclamacaoRepository.delete(reclamacao);
+    }
+
+    // Extrai "portal-infra/reclamacoes/xyz123" da URL completa
+    private String extrairPublicId(String url) {
+        int inicio = url.indexOf("portal-infra/reclamacoes/");
+        int fim = url.lastIndexOf(".");
+        if (inicio != -1 && fim != -1) {
+            return url.substring(inicio, fim);
+        }
+        return null;
+    }
+
+    @Transactional
+    public ReclamacaoResponse atualizarStatus(Long id, String novoStatus, Long adminId) {
+        Usuario admin = usuarioRepository.findById(adminId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário solicitante não encontrado."));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getTipo())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Apenas administradores podem atualizar o status da reclamação.");
+        }
+
+        Reclamacao reclamacao = reclamacaoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
+
+        if (!novoStatus.equals("Pendente") && !novoStatus.equals("Em Andamento") && !novoStatus.equals("Resolvido")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status inválido.");
+        }
+
+        reclamacao.setStatus(novoStatus);
+        return ReclamacaoResponse.de(reclamacaoRepository.save(reclamacao));
+    }
+
 }

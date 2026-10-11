@@ -3,6 +3,8 @@ package org.example.portalinfra.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "comentario")
@@ -28,6 +30,13 @@ public class Comentario {
     @JoinColumn(name = "reclamacao_id", nullable = false)
     private Reclamacao reclamacao;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comentario_pai_id")
+    private Comentario comentarioPai;
+
+    @OneToMany(mappedBy = "comentarioPai", cascade = CascadeType.ALL)
+    private List<Comentario> respostas = new ArrayList<>();
+
     public Comentario() {}
 
     @PrePersist
@@ -49,4 +58,10 @@ public class Comentario {
 
     public Reclamacao getReclamacao() { return reclamacao; }
     public void setReclamacao(Reclamacao reclamacao) { this.reclamacao = reclamacao; }
+
+    public Comentario getComentarioPai() { return comentarioPai; }
+    public void setComentarioPai(Comentario comentarioPai) { this.comentarioPai = comentarioPai; }
+
+    public List<Comentario> getRespostas() { return respostas; }
+    public void setRespostas(List<Comentario> respostas) { this.respostas = respostas; }
 }

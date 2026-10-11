@@ -22,9 +22,9 @@ public class ComentarioService {
     private final ReclamacaoRepository reclamacaoRepository;
 
     public ComentarioService(
-        ComentarioRepository comentarioRepository,
-        UsuarioRepository usuarioRepository,
-        ReclamacaoRepository reclamacaoRepository
+            ComentarioRepository comentarioRepository,
+            UsuarioRepository usuarioRepository,
+            ReclamacaoRepository reclamacaoRepository
     ) {
         this.comentarioRepository = comentarioRepository;
         this.usuarioRepository = usuarioRepository;
@@ -34,9 +34,9 @@ public class ComentarioService {
     @Transactional
     public ComentarioResponse criar(Long usuarioId, Long reclamacaoId, ComentarioRequest request) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
         Reclamacao reclamacao = reclamacaoRepository.findById(reclamacaoId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
 
         if (!usuario.isEstaAtivo()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Conta de usuário está desativada.");
@@ -47,15 +47,22 @@ public class ComentarioService {
         comentario.setUsuario(usuario);
         comentario.setReclamacao(reclamacao);
 
+        // Se veio o ID de um comentário pai, vincula como resposta a ele
+        if (request.comentarioPaiId() != null) {
+            Comentario pai = comentarioRepository.findById(request.comentarioPaiId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comentário original não encontrado."));
+            comentario.setComentarioPai(pai);
+        }
+
         Comentario salvo = comentarioRepository.save(comentario);
         return ComentarioResponse.de(salvo);
     }
 
     @Transactional(readOnly = true)
     public List<ComentarioResponse> listarPorReclamacao(Long reclamacaoId) {
-        return comentarioRepository.findByReclamacaoIdOrderByDataCriacaoAsc(reclamacaoId)
-            .stream()
-            .map(ComentarioResponse::de)
-            .toList();
+        return comentarioRepository.findByReclamacaoIdAndComentarioPaiIsNullOrderByDataCriacaoAsc(reclamacaoId)
+                .stream()
+                .map(ComentarioResponse::de)
+                .toList();
     }
 }

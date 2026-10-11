@@ -130,7 +130,7 @@
                             03/09/2026
                         </span>
 
-                        <button>
+                        <button onclick="abrirComentarios(1)">
                             Ver detalhes
                         </button>
 
@@ -183,7 +183,7 @@
                             02/09/2026
                         </span>
 
-                        <button>
+                        <button onclick="abrirComentarios(2)">
                             Ver detalhes
                         </button>
 
@@ -236,7 +236,7 @@
                             01/09/2026
                         </span>
 
-                        <button>
+                        <button onclick="abrirComentarios(3)">
                             Ver detalhes
                         </button>
 
@@ -289,7 +289,7 @@
                             30/08/2026
                         </span>
 
-                        <button>
+                        <button onclick="abrirComentarios(4)">
                             Ver detalhes
                         </button>
 
@@ -342,7 +342,7 @@
                             29/08/2026
                         </span>
 
-                        <button>
+                        <button onclick="abrirComentarios(5)">
                             Ver detalhes
                         </button>
 
@@ -395,7 +395,7 @@
                             27/08/2026
                         </span>
 
-                        <button>
+                        <button onclick="abrirComentarios(6)">
                             Ver detalhes
                         </button>
 
@@ -418,7 +418,25 @@
             <button>5</button>
 
         </div>
+        <!-- MODAL DE COMENTÁRIOS -->
+        <div id="modal-comentarios" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
+            <div style="background: white; width: 90%; max-width: 550px; max-height: 85vh; border-radius: 12px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
 
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <h3 style="font-size: 18px; color: #111;">Comentários</h3>
+                    <button onclick="fecharModalComentarios()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">&times;</button>
+                </div>
+
+                <!-- Campo para criar comentário principal -->
+                <div style="display: flex; gap: 8px;">
+                    <textarea id="novo-comentario-texto" placeholder="Comente algo sobre esta reclamação..." style="flex: 1; border-radius: 6px; border: 1px solid #ccc; padding: 8px; font-size: 13px; resize: none; height: 50px;"></textarea>
+                    <button onclick="enviarComentarioPrincipal()" style="background: #2563EB; color: white; border: none; border-radius: 6px; padding: 0 14px; font-weight: bold; cursor: pointer;">Publicar</button>
+                </div>
+
+                <!-- Lista encadeada de comentários -->
+                <div id="lista-comentarios" style="margin-top: 10px;"></div>
+            </div>
+        </div>
     </main>
 
 
@@ -438,7 +456,7 @@
         </span>
 
     </footer>
-
+    <script src="comentarios.js"></script>
 </body>
 
 </html>

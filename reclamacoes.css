@@ -496,3 +496,41 @@ footer {
         text-align: center;
     }
 }
+
+/* Efeito de Thread / Respostas estilo Twitter */
+.comentario-item {
+    padding: 10px 0;
+}
+
+.comentario-autor {
+    font-weight: bold;
+    font-size: 13px;
+    color: #111;
+}
+
+.comentario-texto {
+    font-size: 14px;
+    margin: 4px 0 6px 0;
+    color: #333;
+}
+
+.btn-responder {
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-responder:hover {
+    text-decoration: underline;
+}
+
+/* Caixa de respostas filhas com linha vertical conectando */
+.respostas-container {
+    margin-left: 24px;
+    border-left: 2px solid #cfd9de; /* Linha vertical estilo Twitter */
+    padding-left: 14px;
+    margin-top: 8px;
+}

@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 @Table(name = "reclamacoes")
 public class Reclamacao {
 
+    @OneToMany(mappedBy = "reclamacao")
+    private java.util.List<Comentario> comentarios;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

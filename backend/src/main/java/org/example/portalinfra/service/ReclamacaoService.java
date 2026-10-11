@@ -133,14 +133,12 @@ public class ReclamacaoService {
     @Transactional(readOnly = true)
     public Page<ReclamacaoResponse> listarTodas(Pageable pageable) {
         return reclamacaoRepository.findAllByOrderByDataCriacaoDesc(pageable)
-                .stream()
                 .map(ReclamacaoResponse::de);
     }
 
     @Transactional(readOnly = true)
     public Page<ReclamacaoResponse> listarPorUsuario(Long usuarioId,  Pageable pageable) {
         return reclamacaoRepository.findByUsuarioIdOrderByDataCriacaoDesc(usuarioId, pageable)
-                .stream()
                 .map(ReclamacaoResponse::de);
     }
 

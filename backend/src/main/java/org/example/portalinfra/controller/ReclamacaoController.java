@@ -89,4 +89,16 @@ public class ReclamacaoController {
         return ResponseEntity.ok(atualizada);
     }
 
+
+    @PatchMapping(value = "/{id}", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<org.example.portalinfra.dto.ReclamacaoResponse> editarReclamacao(
+            @PathVariable Long id,
+            @RequestParam("usuarioId") Long usuarioId,
+            @RequestPart("dados") org.example.portalinfra.dto.ReclamacaoRequest request,
+            @RequestPart(value = "foto", required = false) org.springframework.web.multipart.MultipartFile novaFoto) {
+
+        var response = reclamacaoService.editarReclamacao(id, usuarioId, request, novaFoto);
+        return org.springframework.http.ResponseEntity.ok(response);
+    }
+
 }

@@ -37,6 +37,12 @@ public class Comentario {
     @OneToMany(mappedBy = "comentarioPai", cascade = CascadeType.ALL)
     private List<Comentario> respostas = new ArrayList<>();
 
+    @Column(name = "foto_url", length = 1000)
+    private String fotoUrl;
+
+    @Column(name = "is_resolucao", nullable = false, columnDefinition = "boolean default false")
+    private boolean isResolucao = false;
+
     public Comentario() {}
 
     @PrePersist
@@ -64,4 +70,10 @@ public class Comentario {
 
     public List<Comentario> getRespostas() { return respostas; }
     public void setRespostas(List<Comentario> respostas) { this.respostas = respostas; }
+
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
+
+    public boolean isResolucao() { return isResolucao; }
+    public void setResolucao(boolean isResolucao) { this.isResolucao = isResolucao; }
 }

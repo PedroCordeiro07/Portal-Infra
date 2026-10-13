@@ -5,5 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 public record ComentarioRequest(
     @NotBlank
     String texto,
-    Long comentarioPaiId
+    Long comentarioPaiId,
+    Boolean isResolucao
 ) {}

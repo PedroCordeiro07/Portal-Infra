@@ -8,9 +8,6 @@ import java.time.LocalDateTime;
 @Table(name = "reclamacoes")
 public class Reclamacao {
 
-    @OneToMany(mappedBy = "reclamacao")
-    private java.util.List<Comentario> comentarios;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,6 +40,9 @@ public class Reclamacao {
             nullable = false,
             updatable = false)
     private LocalDateTime dataCriacao;
+
+    @OneToMany(mappedBy = "reclamacao", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Comentario> comentarios = new java.util.ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
@@ -141,4 +141,8 @@ public class Reclamacao {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
+    public java.util.List<Comentario> getComentarios() { return comentarios; }
+
+    public void setComentarios(java.util.List<Comentario> comentarios) { this.comentarios = comentarios; }
 }

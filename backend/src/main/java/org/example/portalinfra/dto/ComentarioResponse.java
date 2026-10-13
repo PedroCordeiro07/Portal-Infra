@@ -7,6 +7,8 @@ import java.util.List;
 public record ComentarioResponse(
         Long id,
         String texto,
+        String fotoUrl,
+        boolean isResolucao,
         LocalDateTime dataCriacao,
         Long usuarioId,
         String usuarioNome,
@@ -22,6 +24,8 @@ public record ComentarioResponse(
         return new ComentarioResponse(
                 c.getId(),
                 c.getTexto(),
+                c.getFotoUrl(),
+                c.isResolucao(),
                 c.getDataCriacao(),
                 c.getUsuario().getId(),
                 c.getUsuario().getNome(),

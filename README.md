@@ -12,9 +12,9 @@ O projeto está alinhado ao **ODS 11 — Cidades e Comunidades Sustentáveis**, 
 
 ## Versão Atual
 
-**Sprint 3 — Reclamações**
+**Sprint 5 — Interações e Moderação**
 
-O sistema agora possui o módulo de Reclamações concluído. Os usuários podem relatar problemas de infraestrutura com fotos, enquanto o sistema garante segurança e escalabilidade através de paginação, integração com armazenamento em nuvem e restrições de acesso (RBAC) para administradores.
+O sistema agora possui os módulos de Comentários e Denúncias (Moderação) concluídos. Os usuários podem interagir em threads com proteção contra aninhamento infinito, postar provas de resolução com fotos obrigatórias e editar seus conteúdos de forma segura usando requisições PATCH. O sistema também conta com um painel administrativo robusto que permite gerenciar denúncias através de filas separadas e apagar conteúdos maliciosos com exclusão em cascata controlada, sem vazar armazenamento na nuvem.
 
 ### Funcionalidades Atuais
 
@@ -27,14 +27,17 @@ O sistema agora possui o módulo de Reclamações concluído. Os usuários podem
 - [x] Redefinição de senha através de token
 - [x] Persistência de usuários no PostgreSQL
 - [x] Configuração de segurança com Spring Security
-- [x] Publicação de reclamações
-- [x] Upload e exclusão segura de imagens (Cloudinary)
+- [x] Publicação de reclamações com upload e exclusão segura de imagens (Cloudinary)
+- [x] Edição parcial de reclamações (`PATCH`) com substituição segura de fotos
 - [x] Feed de reclamações otimizado com Paginação
-- [x] Exclusão de reclamações (restrita ao autor ou Administrador)
-- [x] Atualização de status das ocorrências (restrita a Administradores)
-- [ ] Comentários e respostas
-- [ ] Denúncias
-- [ ] Mapa interativo
+- [x] Exclusão de reclamações e imagens vinculadas (restrita ao autor ou Administrador)
+- [x] Sistema de comentários em thread achatada
+- [x] Marcação de comentário como "Resolução" com exigência obrigatória de foto
+- [x] Edição parcial de comentários (`PATCH`) com flag para remoção opcional de foto
+- [x] Sistema de denúncias (Design XOR: Reclamações ou Comentários) com regras anti-spam e bloqueio de autorrelato
+- [x] Filas de moderação administrativa para aprovação/rejeição de denúncias
+- [x] Inspeção de segurança a nível de bytes (`ImageIO.read()`) para uploads
+- [x] Mapa interativo
 - [ ] Filtro por bairro
 
 ## Histórico de Sprints
@@ -49,10 +52,10 @@ O sistema de usuários foi implementado, incluindo cadastro, login, verificaçã
 Implementação completa do sistema de criação, listagem paginada, exclusão e alteração de status de reclamações de infraestrutura com upload de evidências.
 
 ### Sprint 4 — Mapa e Localização
-Implementação do mapa interativo, marcadores e filtragem das ocorrências por localização.
+Implementação do mapa interativo, marcadores e filtragem das ocorrências por localização. *(Nota: Planejado para ser executado com o Front-end)*
 
 ### Sprint 5 — Interações
-Implementação de comentários, respostas e sistema de denúncias comunitárias.
+Implementação de comentários, respostas, validações de arquivo e sistema avançado de moderação/denúncias comunitárias.
 
 ## Roadmap
 
@@ -62,6 +65,7 @@ Implementação de comentários, respostas e sistema de denúncias comunitárias
 - [x] Definir nível de gravidade
 - [x] Registrar localização
 - [x] Visualizar reclamações no feed
+- [x] Editar reclamações (PATCH)
 
 ### Mapa
 - [ ] Exibir reclamações no mapa
@@ -70,10 +74,11 @@ Implementação de comentários, respostas e sistema de denúncias comunitárias
 - [ ] Integrar Google Maps JavaScript API
 
 ### Interações
-- [ ] Adicionar comentários
-- [ ] Responder comentários
-- [ ] Denunciar reclamações
-- [ ] Denunciar comentários
+- [x] Adicionar comentários
+- [x] Responder comentários (Flattened Threads)
+- [x] Denunciar reclamações
+- [x] Denunciar comentários
+- [x] Painel de Resolução de Denúncias (Admin)
 
 ## Tecnologias
 
@@ -81,7 +86,7 @@ Implementação de comentários, respostas e sistema de denúncias comunitárias
 - Spring Boot
 - Spring Security
 - Maven
-- PostgreSQL
+- PostgreSQL (Neon)
 - Cloudinary (Armazenamento de Imagens)
 - HTML5
 - CSS3
@@ -114,21 +119,34 @@ arthx06-portal-infra/
             │       │   ├── SecurityConfig.java
             │       │   └── CloudinaryConfig.java
             │       ├── controller/
+            │       │   ├── ComentarioController.java
+            │       │   ├── DenunciaController.java
             │       │   ├── ReclamacaoController.java
             │       │   └── UsuarioController.java
+            │       ├── dto/
+            │       │   ├── ComentarioRequest.java
+            │       │   ├── ComentarioResponse.java
+            │       │   ├── DenunciaRequest.java
+            │       │   ├── DenunciaResponse.java
+            │       │   ├── ReclamacaoRequest.java
+            │       │   └── ReclamacaoResponse.java
             │       ├── model/
-            │       │   ├── dto/
-            │       │   │   └── ReclamacaoResponse.java
+            │       │   ├── Comentario.java
+            │       │   ├── Denuncia.java
             │       │   ├── EmailVerification.java
             │       │   ├── PasswordResetToken.java
             │       │   ├── Reclamacao.java
             │       │   └── Usuario.java
             │       ├── repository/
+            │       │   ├── ComentarioRepository.java
+            │       │   ├── DenunciaRepository.java
             │       │   ├── EmailVerificationRepository.java
             │       │   ├── PasswordResetTokenRepository.java
             │       │   ├── ReclamacaoRepository.java
             │       │   └── UsuarioRepository.java
             │       └── service/
+            │           ├── ComentarioService.java
+            │           ├── DenunciaService.java
             │           ├── EmailService.java
             │           ├── ReclamacaoService.java
             │           └── UsuarioService.java

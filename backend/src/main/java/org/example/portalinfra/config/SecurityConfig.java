@@ -26,15 +26,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/usuarios/**").permitAll()
-                .requestMatchers("/reclamacoes/**").permitAll()
-                .requestMatchers("/comentarios/**").permitAll()
-                .anyRequest().authenticated()
-            );
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        .requestMatchers("/usuarios/**").permitAll()
+                        .requestMatchers("/reclamacoes/**").permitAll()
+                        .requestMatchers("/comentarios/**").permitAll()
+                        .requestMatchers("/denuncias/**").permitAll()
+
+                        .anyRequest().authenticated()
+                );
         return http.build();
     }
 
@@ -43,18 +51,18 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:5500",
-            "http://127.0.0.1:5500",
-            "https://arthx06.github.io"
+                "http://localhost:5500",
+                "http://127.0.0.1:5500",
+                "https://arthx06.github.io"
         ));
 
         configuration.setAllowedMethods(List.of(
-            "GET",
-            "POST",
-            "PUT",
-            "PATCH",
-            "DELETE",
-            "OPTIONS"
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
         ));
 
         configuration.setAllowedHeaders(List.of("*"));

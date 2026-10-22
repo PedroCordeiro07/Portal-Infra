@@ -658,7 +658,7 @@ footer .logo span {
 }
 #cadastro-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   column-gap: 20px;
 }
 #cadastro-form > .input-group:first-child,

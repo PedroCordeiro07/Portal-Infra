@@ -1,462 +1,317 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reclamações | Portal-Infra</title>
 
-    <link rel="stylesheet" href="reclamacoes.css">
-    <link rel="stylesheet" href="style.css">
-</head>
+    <!-- Adicionando a fonte moderna Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-<body>
-
+    <link rel="stylesheet" href="reclamacoes.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <header class="header">
+      <div class="logo"><span>Portal</span> Infra</div>
 
-        <div class="logo">
-            <span>Portal</span> Infra
-        </div>
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="#">Mapa</a>
+        <a href="reclamacoes.html" class="active">Reclamações</a>
+        <a href="#">Sobre</a>
+      </nav>
 
-        <nav>
-            <a href="index.html">Início</a>
-            <a href="#">Mapa</a>
-            <a href="reclamacoes.html">Reclamações</a>
-            <a href="#">Sobre</a>
-        </nav>
-
-        <a href="index.html"><button class="btn-secondary">Voltar</button></a>
-
+      <a href="index.html"><button class="btn-secondary">Voltar</button></a>
     </header>
 
-
     <main class="container">
+      <section class="filters">
+        <input
+          type="text"
+          placeholder="Pesquisar reclamação..."
+          class="search"
+        />
 
-       
-        <section class="filters">
+        <select>
+          <option>Todos os problemas</option>
+          <option>Buraco na rua</option>
+          <option>Rua sem asfalto</option>
+          <option>Poste sem iluminação</option>
+          <option>Árvore caída</option>
+          <option>Calçada danificada</option>
+          <option>Alagamento</option>
+        </select>
 
-            <input
-                type="text"
-                placeholder="Pesquisar reclamação..."
-                class="search"
+        <select>
+          <option>Todos os bairros</option>
+          <option>Tatuapé</option>
+          <option>Itaquera</option>
+          <option>Mooca</option>
+          <option>Vila Mariana</option>
+          <option>São Mateus</option>
+        </select>
+
+        <select>
+          <option>Todos os status</option>
+          <option>Pendente</option>
+          <option>Resolvido</option>
+        </select>
+
+        <button class="btn-filter">Filtrar</button>
+      </section>
+
+      <div class="results">
+        <strong>1.248 reclamações</strong>
+        <span>Mais recentes</span>
+      </div>
+
+      <section class="complaints-grid">
+        <!-- CARD 1 -->
+        <div class="complaint-card">
+          <div class="image-container">
+            <img src="img/buraco.jpg" alt="Buraco em rua" />
+            <span class="category">Buraco na rua</span>
+          </div>
+          <div class="card-content">
+            <span class="status pending">Pendente</span>
+            <h2>Buraco grande na rua</h2>
+            <p class="location">Rua Antônio Carlos, Tatuapé</p>
+            <p class="description">
+              Buraco ocupando parte da faixa de circulação dos veículos.
+            </p>
+            <div class="card-footer">
+              <span>03/09/2026</span>
+              <button onclick="abrirComentarios(1)">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="complaint-card">
+          <div class="image-container">
+            <img src="img/poste.jpg" alt="Poste sem iluminação" />
+            <span class="category">Iluminação</span>
+          </div>
+          <div class="card-content">
+            <span class="status pending">Pendente</span>
+            <h2>Poste sem iluminação</h2>
+            <p class="location">Rua das Flores, Itaquera</p>
+            <p class="description">
+              Poste localizado próximo à praça está sem iluminação durante a
+              noite.
+            </p>
+            <div class="card-footer">
+              <span>02/09/2026</span>
+              <button onclick="abrirComentarios(2)">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="complaint-card">
+          <div class="image-container">
+            <img src="img/arvore.jpg" alt="Árvore caída" />
+            <span class="category">Árvore</span>
+          </div>
+          <div class="card-content">
+            <span class="status resolved">Resolvido</span>
+            <h2>Árvore caída na calçada</h2>
+            <p class="location">Rua Vergueiro, Vila Mariana</p>
+            <p class="description">
+              Árvore caiu após uma forte chuva e bloqueou parte da calçada.
+            </p>
+            <div class="card-footer">
+              <span>01/09/2026</span>
+              <button onclick="abrirComentarios(3)">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="complaint-card">
+          <div class="image-container">
+            <img src="img/calcada.jpg" alt="Calçada danificada" />
+            <span class="category">Calçada</span>
+          </div>
+          <div class="card-content">
+            <span class="status pending">Pendente</span>
+            <h2>Calçada danificada</h2>
+            <p class="location">Rua Azevedo Soares, Tatuapé</p>
+            <p class="description">
+              Calçada apresenta vários pontos quebrados, dificultando a passagem
+              de pedestres.
+            </p>
+            <div class="card-footer">
+              <span>30/08/2026</span>
+              <button onclick="abrirComentarios(4)">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 5 -->
+        <div class="complaint-card">
+          <div class="image-container">
+            <img src="img/alagamento.jpg" alt="Alagamento na rua" />
+            <span class="category">Alagamento</span>
+          </div>
+          <div class="card-content">
+            <span class="status pending">Pendente</span>
+            <h2>Alagamento em via</h2>
+            <p class="location">Avenida Aricanduva, Aricanduva</p>
+            <p class="description">
+              Local apresenta acúmulo de água após chuvas fortes.
+            </p>
+            <div class="card-footer">
+              <span>29/08/2026</span>
+              <button onclick="abrirComentarios(5)">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 6 -->
+        <div class="complaint-card">
+          <div class="image-container">
+            <img src="img/asfalto.jpg" alt="Rua sem pavimentação" />
+            <span class="category">Pavimentação</span>
+          </div>
+          <div class="card-content">
+            <span class="status resolved">Resolvido</span>
+            <h2>Rua sem pavimentação</h2>
+            <p class="location">Rua Jardim Novo, São Mateus</p>
+            <p class="description">
+              Trecho da rua apresentava falta de pavimentação.
+            </p>
+            <div class="card-footer">
+              <span>27/08/2026</span>
+              <button onclick="abrirComentarios(6)">Ver detalhes</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="pagination">
+        <button class="selected">1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>4</button>
+        <button>5</button>
+      </div>
+
+      <!-- MODAL DE COMENTÁRIOS -->
+      <div
+        id="modal-comentarios"
+        style="
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          z-index: 1000;
+          justify-content: center;
+          align-items: center;
+          backdrop-filter: blur(4px);
+        "
+      >
+        <div
+          style="
+            background: white;
+            width: 90%;
+            max-width: 550px;
+            max-height: 85vh;
+            border-radius: 16px;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 1px solid #e2e8f0;
+              padding-bottom: 12px;
+            "
+          >
+            <h3 style="font-size: 20px; font-weight: 700; color: #0f172a">
+              Comentários
+            </h3>
+            <button
+              onclick="fecharModalComentarios()"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #64748b;
+                transition: 0.2s;
+              "
             >
-
-            <select>
-                <option>Todos os problemas</option>
-                <option>Buraco na rua</option>
-                <option>Rua sem asfalto</option>
-                <option>Poste sem iluminação</option>
-                <option>Árvore caída</option>
-                <option>Calçada danificada</option>
-                <option>Alagamento</option>
-            </select>
-
-            <select>
-                <option>Todos os bairros</option>
-                <option>Tatuapé</option>
-                <option>Itaquera</option>
-                <option>Mooca</option>
-                <option>Vila Mariana</option>
-                <option>São Mateus</option>
-            </select>
-
-            <select>
-                <option>Todos os status</option>
-                <option>Pendente</option>
-                <option>Resolvido</option>
-            </select>
-
-            <button class="btn-filter">
-                Filtrar
+              &times;
             </button>
+          </div>
 
-        </section>
+          <!-- Campo para criar comentário principal -->
+          <div style="display: flex; gap: 10px; flex-wrap: wrap">
+            <textarea
+              id="novo-comentario-texto"
+              placeholder="Comente algo sobre esta reclamação..."
+              style="
+                flex: 1;
+                min-width: 250px;
+                border-radius: 8px;
+                border: 1px solid #cbd5e1;
+                padding: 12px;
+                font-size: 14px;
+                font-family: inherit;
+                resize: none;
+                height: 50px;
+                outline: none;
+                background: #f8fafc;
+                transition: 0.2s;
+              "
+            ></textarea>
+            <button
+              onclick="enviarComentarioPrincipal()"
+              style="
+                background: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 0 20px;
+                font-weight: 600;
+                font-size: 14px;
+                cursor: pointer;
+                transition: 0.2s;
+              "
+            >
+              Publicar
+            </button>
+          </div>
 
-
-
-
-        <div class="results">
-
-            <strong>1.248 reclamações</strong>
-
-            <span>Mais recentes</span>
-
+          <!-- Lista encadeada de comentários -->
+          <div id="lista-comentarios" style="margin-top: 10px"></div>
         </div>
-
-
-        <section class="complaints-grid">
-
-
-            <!-- CARD 1 -->
-
-            <div class="complaint-card">
-
-                <div class="image-container">
-
-                    <img
-                        src="img/buraco.jpg"
-                        alt="Buraco em rua"
-                    >
-
-                    <span class="category">
-                        Buraco na rua
-                    </span>
-
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status pending">
-                        Pendente
-                    </span>
-
-                    <h2>
-                        Buraco grande na rua
-                    </h2>
-
-                    <p class="location">
-                        Rua Antônio Carlos, Tatuapé
-                    </p>
-
-                    <p class="description">
-                        Buraco ocupando parte da faixa de circulação
-                        dos veículos.
-                    </p>
-
-                    <div class="card-footer">
-
-                        <span>
-                            03/09/2026
-                        </span>
-
-                        <button onclick="abrirComentarios(1)">
-                            Ver detalhes
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- CARD 2 -->
-
-            <div class="complaint-card">
-
-                <div class="image-container">
-
-                    <img
-                        src="img/poste.jpg"
-                        alt="Poste sem iluminação"
-                    >
-
-                    <span class="category">
-                        Iluminação
-                    </span>
-
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status pending">
-                        Pendente
-                    </span>
-
-                    <h2>
-                        Poste sem iluminação
-                    </h2>
-
-                    <p class="location">
-                        Rua das Flores, Itaquera
-                    </p>
-
-                    <p class="description">
-                        Poste localizado próximo à praça está
-                        sem iluminação durante a noite.
-                    </p>
-
-                    <div class="card-footer">
-
-                        <span>
-                            02/09/2026
-                        </span>
-
-                        <button onclick="abrirComentarios(2)">
-                            Ver detalhes
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- CARD 3 -->
-
-            <div class="complaint-card">
-
-                <div class="image-container">
-
-                    <img
-                        src="img/arvore.jpg"
-                        alt="Árvore caída"
-                    >
-
-                    <span class="category">
-                        Árvore
-                    </span>
-
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status resolved">
-                        Resolvido
-                    </span>
-
-                    <h2>
-                        Árvore caída na calçada
-                    </h2>
-
-                    <p class="location">
-                        Rua Vergueiro, Vila Mariana
-                    </p>
-
-                    <p class="description">
-                        Árvore caiu após uma forte chuva e bloqueou
-                        parte da calçada.
-                    </p>
-
-                    <div class="card-footer">
-
-                        <span>
-                            01/09/2026
-                        </span>
-
-                        <button onclick="abrirComentarios(3)">
-                            Ver detalhes
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- CARD 4 -->
-
-            <div class="complaint-card">
-
-                <div class="image-container">
-
-                    <img
-                        src="img/calcada.jpg"
-                        alt="Calçada danificada"
-                    >
-
-                    <span class="category">
-                        Calçada
-                    </span>
-
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status pending">
-                        Pendente
-                    </span>
-
-                    <h2>
-                        Calçada danificada
-                    </h2>
-
-                    <p class="location">
-                        Rua Azevedo Soares, Tatuapé
-                    </p>
-
-                    <p class="description">
-                        Calçada apresenta vários pontos quebrados,
-                        dificultando a passagem de pedestres.
-                    </p>
-
-                    <div class="card-footer">
-
-                        <span>
-                            30/08/2026
-                        </span>
-
-                        <button onclick="abrirComentarios(4)">
-                            Ver detalhes
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- CARD 5 -->
-
-            <div class="complaint-card">
-
-                <div class="image-container">
-
-                    <img
-                        src="img/alagamento.jpg"
-                        alt="Alagamento na rua"
-                    >
-
-                    <span class="category">
-                        Alagamento
-                    </span>
-
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status pending">
-                        Pendente
-                    </span>
-
-                    <h2>
-                        Alagamento em via
-                    </h2>
-
-                    <p class="location">
-                        Avenida Aricanduva, Aricanduva
-                    </p>
-
-                    <p class="description">
-                        Local apresenta acúmulo de água após
-                        chuvas fortes.
-                    </p>
-
-                    <div class="card-footer">
-
-                        <span>
-                            29/08/2026
-                        </span>
-
-                        <button onclick="abrirComentarios(5)">
-                            Ver detalhes
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- CARD 6 -->
-
-            <div class="complaint-card">
-
-                <div class="image-container">
-
-                    <img
-                        src="img/asfalto.jpg"
-                        alt="Rua sem pavimentação"
-                    >
-
-                    <span class="category">
-                        Pavimentação
-                    </span>
-
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status resolved">
-                        Resolvido
-                    </span>
-
-                    <h2>
-                        Rua sem pavimentação
-                    </h2>
-
-                    <p class="location">
-                        Rua Jardim Novo, São Mateus
-                    </p>
-
-                    <p class="description">
-                        Trecho da rua apresentava falta de
-                        pavimentação.
-                    </p>
-
-                    <div class="card-footer">
-
-                        <span>
-                            27/08/2026
-                        </span>
-
-                        <button onclick="abrirComentarios(6)">
-                            Ver detalhes
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        </section>
-
-
-        <div class="pagination">
-
-            <button class="selected">1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>4</button>
-            <button>5</button>
-
-        </div>
-        <!-- MODAL DE COMENTÁRIOS -->
-        <div id="modal-comentarios" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
-            <div style="background: white; width: 90%; max-width: 550px; max-height: 85vh; border-radius: 12px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                    <h3 style="font-size: 18px; color: #111;">Comentários</h3>
-                    <button onclick="fecharModalComentarios()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">&times;</button>
-                </div>
-
-                <!-- Campo para criar comentário principal -->
-                <div style="display: flex; gap: 8px;">
-                    <textarea id="novo-comentario-texto" placeholder="Comente algo sobre esta reclamação..." style="flex: 1; border-radius: 6px; border: 1px solid #ccc; padding: 8px; font-size: 13px; resize: none; height: 50px;"></textarea>
-                    <button onclick="enviarComentarioPrincipal()" style="background: #2563EB; color: white; border: none; border-radius: 6px; padding: 0 14px; font-weight: bold; cursor: pointer;">Publicar</button>
-                </div>
-
-                <!-- Lista encadeada de comentários -->
-                <div id="lista-comentarios" style="margin-top: 10px;"></div>
-            </div>
-        </div>
+      </div>
     </main>
 
-
     <footer>
-
-       <div class="logo">
-            <span>Portal</span> Infra
-        </div>
-
-
-        <p>
-            Projeto acadêmico de monitoramento da infraestrutura urbana.
-        </p>
-
-        <span>
-            © 2026 SP em Foco
-        </span>
-
+      <div class="logo"><span>Portal</span> Infra</div>
+      <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
+      <span>© 2026 SP em Foco</span>
     </footer>
-    <script src="comentarios.js"></script>
-</body>
 
+    <script src="comentarios.js"></script>
+  </body>
 </html>

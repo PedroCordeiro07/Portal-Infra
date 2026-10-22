@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Entrar - Portal Infra</title>
+
+    <!-- Adicionando a fonte moderna Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="style.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="scriptlogin.js" defer></script>
@@ -18,7 +27,7 @@
         <a href="reclamacoes.html">Reclamações</a>
         <a href="#">Sobre</a>
       </nav>
-      <!-- Como já estamos na página de login, podemos omitir ou mudar o botão do cabeçalho -->
+      <!-- Botão Voltar (estilizado via CSS) -->
       <a href="index.html"><button class="btn-secondary">Voltar</button></a>
     </header>
 
@@ -59,7 +68,15 @@
               <label>
                 <input type="checkbox" name="lembrar" /> Lembrar de mim
               </label>
-              <a href="#" class="forgot-password" onclick="toggleAuth('recuperar'); return false;">Esqueceu a senha?</a>
+              <a
+                href="#"
+                class="forgot-password"
+                onclick="
+                  toggleAuth('recuperar');
+                  return false;
+                "
+                >Esqueceu a senha?</a
+              >
             </div>
 
             <button type="submit" class="btn-primary btn-full">Entrar</button>
@@ -67,18 +84,20 @@
 
           <div class="auth-footer">
             Não tem uma conta?
-            <button class="btn-link" onclick="toggleAuth('cadastro')">Cadastre-se</button>
+            <button class="btn-link" onclick="toggleAuth('cadastro')">
+              Cadastre-se
+            </button>
           </div>
         </div>
 
         <!-- FORMULÁRIO DE CADASTRO -->
-       <div class="auth-card" id="form-cadastro" style="display: none">
+        <div class="auth-card" id="form-cadastro" style="display: none">
           <div class="auth-header">
             <h2>Crie sua conta</h2>
             <p>Junte-se a nós e ajude a melhorar a cidade</p>
           </div>
 
-          <div id="area-verificacao" style="display: none;">
+          <div id="area-verificacao" style="display: none">
             <div class="input-group">
               <label for="codigo_cad">Código de verificação</label>
               <input
@@ -122,6 +141,7 @@
                 required
               />
             </div>
+
             <div class="input-group">
               <label for="telefone_cad">Telefone</label>
               <input
@@ -164,15 +184,16 @@
               />
               <small id="cep-status"></small>
             </div>
+
             <div class="input-group">
-                <label for="data_nasc">Data de Nascimento</label>
-                <input
-                  type="date"
-                  id="data_nasc"
-                  name="dataNascimento"
-                  placeholder="Digite sua data de nascimento"
-                  required
-                />
+              <label for="data_nasc">Data de Nascimento</label>
+              <input
+                type="date"
+                id="data_nasc"
+                name="dataNascimento"
+                placeholder="Digite sua data de nascimento"
+                required
+              />
             </div>
 
             <div class="input-row">
@@ -250,43 +271,52 @@
             >
               Enviar código
             </button>
-          </form>
-        </div>
-          
-
-         
-        </div>
-          <div class="auth-card" id="form-recuperar" style="display: none">
-            <div class="auth-header">
-              <h2>Recuperar senha</h2>
-              <p>Digite seu e-mail para receber instruções de recuperação</p>
-            </div>
-
-            <form action="#" method="POST" id="recuperar-form">
-              <div class="input-group">
-                <label for="email_rec">E-mail cadastrado</label>
-                <input
-                  type="email"
-                  id="email_rec"
-                  name="email"
-                  placeholder="Digite seu e-mail"
-                  required
-                />
-              </div>
-
-              <button type="submit" class="submit btn-primary btn-full">
-                Enviar instruções
-              </button>
-            </form>
 
             <div class="auth-footer">
-              Lembrou sua senha?
-              <button class="btn-link" onclick="toggleAuth('login')">Faça login</button>
+              Já tem uma conta?
+              <button
+                type="button"
+                class="btn-link"
+                onclick="toggleAuth('login')"
+              >
+                Faça login
+              </button>
             </div>
+          </form>
+        </div>
+
+        <!-- FORMULÁRIO DE RECUPERAR SENHA -->
+        <div class="auth-card" id="form-recuperar" style="display: none">
+          <div class="auth-header">
+            <h2>Recuperar senha</h2>
+            <p>Digite seu e-mail para receber instruções de recuperação</p>
+          </div>
+
+          <form action="#" method="POST" id="recuperar-form">
+            <div class="input-group">
+              <label for="email_rec">E-mail cadastrado</label>
+              <input
+                type="email"
+                id="email_rec"
+                name="email"
+                placeholder="Digite seu e-mail"
+                required
+              />
+            </div>
+
+            <button type="submit" class="submit btn-primary btn-full">
+              Enviar instruções
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            Lembrou sua senha?
+            <button class="btn-link" onclick="toggleAuth('login')">
+              Faça login
+            </button>
           </div>
         </div>
       </div>
-      
     </main>
 
     <!-- RODAPÉ -->
@@ -295,8 +325,5 @@
       <p>Projeto acadêmico de monitoramento da infraestrutura urbana.</p>
       <span>© 2026 SP em Foco</span>
     </footer>
-
-   
-
   </body>
 </html>

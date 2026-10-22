@@ -838,3 +838,27 @@ footer .logo span {
     flex: 1;
   }
 }
+
+/* =========================
+   AJUSTE DO BOTÃO VOLTAR (NAVBAR) - GLOBAL
+========================= */
+.header .btn-secondary {
+  background: transparent;
+  color: var(--text-muted);
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  box-shadow: none;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.header .btn-secondary:hover {
+  background: #f1f5f9;
+  color: var(--primary);
+  border-color: #cbd5e1;
+  transform: translateY(0);
+}

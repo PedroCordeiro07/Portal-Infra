@@ -1,192 +1,243 @@
-
 /* =========================
-   NOVA RECLAMAÇÃO
+   NOVA RECLAMAÇÃO (Formulário Moderno)
 ========================= */
 
 .nova-reclamacao {
-    width: 100%;
-    padding: 45px 8% 60px;
-    min-height: calc(100vh - 176px);
+  width: 100%;
+  padding: 60px 8% 80px;
+  min-height: calc(100vh - 160px);
+  background: var(--bg-color); /* Herdado do style.css */
 }
 
 .formulario-reclamacao {
-    max-width: 850px;
-    margin: 0 auto;
-    padding: 35px 40px;
-    background: white;
-    border: 1px solid #e8e8e8;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.025);
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 45px 50px;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); /* Cantos mais suaves */
+  box-shadow: var(--shadow-lg); /* Sombra alinhada ao padrão do portal */
 }
 
+/* =========================
+   CABEÇALHO DO FORMULÁRIO
+========================= */
 .formulario-cabecalho {
-    margin-bottom: 30px;
+  margin-bottom: 35px;
+  text-align: center;
 }
 
 .formulario-tag {
-    display: inline-block;
-    color: #2563eb;
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
+  display: inline-block;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
 }
 
 .formulario-cabecalho h1 {
-    font-size: 30px;
-    color: #0f172a;
-    margin-bottom: 12px;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 12px;
 }
 
 .formulario-cabecalho p {
-    color: #70757d;
-    font-size: 15px;
-    line-height: 1.6;
-    max-width: 600px;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-/* Campos */
-
+/* =========================
+   CAMPOS E INPUTS
+========================= */
 .campo-reclamacao {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 22px;
-    min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  min-width: 0;
 }
 
+/* Alteração: Cor e estilo dos Tópicos (Labels) */
 .campo-reclamacao label {
-    color: #303744;
-    font-size: 14px;
-    font-weight: bold;
+  color: var(--primary); /* Azul marcante do Portal Infra */
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 .campo-reclamacao input,
 .campo-reclamacao select,
 .campo-reclamacao textarea {
-    width: 100%;
-    padding: 13px 14px;
-    border: 1px solid #d9dfe8;
-    border-radius: 8px;
-    background: #fff;
-    color: #303744;
-    font-family: inherit;
-    font-size: 14px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  color: var(--text-dark);
+  font-family: inherit;
+  font-size: 15px;
+  transition: 0.2s;
 }
 
 .campo-reclamacao input:focus,
 .campo-reclamacao select:focus,
 .campo-reclamacao textarea:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+  background: var(--white);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .campo-reclamacao textarea {
-    min-height: 130px;
-    resize: vertical;
-    line-height: 1.5;
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.5;
 }
 
+/* Input de Foto mais amigável */
 .campo-reclamacao input[type="file"] {
-    padding: 10px;
-    background: #fafbfc;
+  padding: 12px;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.campo-reclamacao input[type="file"]::file-selector-button {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: var(--text-dark);
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: 0.2s;
+}
+
+.campo-reclamacao input[type="file"]::file-selector-button:hover {
+  background: #f8fafc;
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .campo-reclamacao small {
-    color: #818895;
-    font-size: 12px;
-    line-height: 1.5;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
 }
 
-/* Bairro e gravidade */
-
+/* Bairro e gravidade (Grid) */
 .campos-linha {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
-/* Mensagem do formulário */
-
+/* Mensagem de Erro/Sucesso */
 #mensagem-formulario {
-    color: #2563eb;
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 12px;
+  color: #10b981; /* Verde Sucesso */
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-/* Botões */
-
+/* =========================
+   BOTÕES INFERIORES
+========================= */
 .acoes-formulario {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 12px;
-    padding-top: 8px;
-    border-top: 1px solid #eeeeee;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+  margin-top: 10px;
 }
 
 .btn-cancelar {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: 14px 20px;
-    background: #f0f1f3;
-    color: #303744;
-    border-radius: 9px;
-    font-size: 14px;
-    font-weight: bold;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 24px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
 .btn-cancelar:hover {
-    background: #e4e7eb;
+  background: #f1f5f9;
+  color: var(--text-dark);
+  border-color: var(--border-light);
 }
 
 .acoes-formulario .btn-primary {
-    font-size: 14px;
-    border: none;
+  font-size: 15px;
+  padding: 14px 32px;
 }
 
-/* Responsividade */
-
+/* =========================
+   RESPONSIVIDADE (MOBILE)
+========================= */
 @media (max-width: 800px) {
-    .nova-reclamacao {
-        padding: 30px 5%;
-    }
+  .nova-reclamacao {
+    padding: 40px 5%;
+  }
 
-    .formulario-reclamacao {
-        padding: 28px 24px;
-    }
+  .formulario-reclamacao {
+    padding: 35px 30px;
+  }
 
-    .formulario-cabecalho h1 {
-        font-size: 25px;
-    }
+  .formulario-cabecalho h1 {
+    font-size: 28px;
+  }
 }
 
-@media (max-width: 500px) {
-    .nova-reclamacao {
-        padding: 20px 4%;
-    }
+@media (max-width: 600px) {
+  .nova-reclamacao {
+    padding: 30px 4%;
+  }
 
-    .formulario-reclamacao {
-        padding: 24px 18px;
-    }
+  .formulario-reclamacao {
+    padding: 30px 20px;
+  }
 
-    .campos-linha {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
+  .formulario-cabecalho {
+    text-align: left;
+  }
 
-    .acoes-formulario {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
+  .campos-linha {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 
-    .btn-cancelar,
-    .acoes-formulario .btn-primary {
-        width: 100%;
-        text-align: center;
-    }
+  .acoes-formulario {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .btn-cancelar,
+  .acoes-formulario .btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .campo-reclamacao input[type="file"]::file-selector-button {
+    display: block;
+    margin-bottom: 8px;
+    width: 100%;
+    text-align: center;
+  }
 }

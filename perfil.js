@@ -1,13 +1,13 @@
 
-const API_BASE = "https://portal-infra-backend.onrender.com";
+
 
 document.addEventListener("DOMContentLoaded", async function () {
     const usuarioLogado = localStorage.getItem("usuarioLogado");
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
-    if (usuarioLogado !== "true" || !usuario.id) {
-        window.location.href = "login.html";
-        return;
+    if (!(await sessaoAtiva())) {
+    window.location.replace("login.html");
+    return;   // no perfil.js; no reclamacao.js, veja a nota abaixo
     }
 
     const formulario = document.getElementById("formularioPerfil");
@@ -76,10 +76,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Carrega os dados atuais do banco.
     try {
-        const resposta = await fetch(
-            `${API_BASE}/usuarios/${usuario.id}`
-        );
-
+        const resposta = await apiFetch("/usuarios/me");
         if (!resposta.ok) {
             throw new Error("Não foi possível carregar seu perfil.");
         }
@@ -152,16 +149,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         botaoSalvar.textContent = "Salvando...";
 
         try {
-            const resposta = await fetch(
-                `${API_BASE}/usuarios/${usuario.id}/perfil`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
+           const resposta = await apiFetch("/usuarios/me/perfil", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
 
             const resultado = await resposta.json().catch(() => ({}));
 
@@ -244,16 +236,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         botaoExcluirConta.textContent = "Desativando...";
 
         try {
-            const resposta = await fetch(
-                `${API_BASE}/usuarios/${usuario.id}/desativar`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ senha })
-                }
-            );
+            const resposta = await apiFetch("/usuarios/me/desativar", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ senha })
+            });
 
             const resultado = await resposta.json().catch(() => ({}));
 

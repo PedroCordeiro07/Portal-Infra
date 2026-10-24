@@ -6,10 +6,13 @@ const campoFoto = document.getElementById("foto");
 const usuarioLogado = localStorage.getItem("usuarioLogado");
 const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
-if (usuarioLogado !== "true" || !usuario.id) {
+async function sessaoAtiva() { 
+    if (!(await sessaoAtiva())) {
     window.location.replace("login.html");
+    return;   // no perfil.js; no reclamacao.js, veja a nota abaixo
+    }
 }
-const API_BASE = "https://portal-infra-backend.onrender.com";
+
 
 formulario.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -81,13 +84,10 @@ formulario.addEventListener("submit", async function (event) {
     botao.textContent = "Enviando...";
 
     try {
-        const resposta = await fetch(
-            `${API_BASE}/reclamacoes?usuarioId=${encodeURIComponent(usuario.id)}`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
+        const resposta = await apiFetch("/reclamacoes", {
+            method: "POST",
+            body: formData      // sem Content-Type: o navegador monta o multipart sozinho
+        });
 
         if (!resposta.ok) {
             const erro = await resposta.text();

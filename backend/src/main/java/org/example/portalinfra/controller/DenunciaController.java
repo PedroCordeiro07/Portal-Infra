@@ -5,6 +5,8 @@ import org.example.portalinfra.dto.DenunciaResponse;
 import org.example.portalinfra.service.DenunciaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.example.portalinfra.config.SessaoUtil;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -21,32 +23,29 @@ public class DenunciaController {
 
     @PostMapping
     public ResponseEntity<DenunciaResponse> criarDenuncia(
-            @RequestParam("usuarioId") Long usuarioId,
+            Authentication auth,
             @RequestBody DenunciaRequest request) {
-
-        DenunciaResponse response = denunciaService.criarDenuncia(usuarioId, request);
-        return ResponseEntity.status(201).body(response);
+        return ResponseEntity.status(201).body(
+            denunciaService.criarDenuncia(SessaoUtil.idLogado(auth), request));
     }
-
 
     @GetMapping("/reclamacoes")
-    public ResponseEntity<List<DenunciaResponse>> listarDenunciasDeReclamacoes(@RequestParam("adminId") Long adminId) {
-        return ResponseEntity.ok(denunciaService.listarDenunciasDeReclamacoes(adminId));
+    public ResponseEntity<List<DenunciaResponse>> listarDenunciasDeReclamacoes(Authentication auth) {
+        return ResponseEntity.ok(
+            denunciaService.listarDenunciasDeReclamacoes(SessaoUtil.idLogado(auth)));
     }
-
     @GetMapping("/comentarios")
-    public ResponseEntity<List<DenunciaResponse>> listarDenunciasDeComentarios(@RequestParam("adminId") Long adminId) {
-        return ResponseEntity.ok(denunciaService.listarDenunciasDeComentarios(adminId));
+    public ResponseEntity<List<DenunciaResponse>> listarDenunciasDeComentarios(Authentication auth) {
+        return ResponseEntity.ok(
+            denunciaService.listarDenunciasDeComentarios(SessaoUtil.idLogado(auth)));
     }
-
 
     @PatchMapping("/{id}/resolver")
     public ResponseEntity<DenunciaResponse> resolverDenuncia(
             @PathVariable Long id,
-            @RequestParam("adminId") Long adminId,
+            Authentication auth,
             @RequestParam("aceitar") boolean aceitar) {
-
-        DenunciaResponse response = denunciaService.resolverDenuncia(id, adminId, aceitar);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+            denunciaService.resolverDenuncia(id, SessaoUtil.idLogado(auth), aceitar));
     }
 }

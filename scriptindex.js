@@ -1,5 +1,8 @@
-const API_BASE = "https://portal-infra-backend.onrender.com";
 
+async function sessaoAtiva() {
+  const r = await apiFetch("/usuarios/sessao");
+  return r.ok;
+}
 async function carregarContagem() {
   try {
     const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
@@ -16,14 +19,23 @@ async function carregarContagem() {
 carregarContagem();
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    const usuarioLogado = localStorage.getItem("usuarioLogado");
+document.addEventListener("DOMContentLoaded", async function () {
+    const usuarioLogado = await sessaoAtiva();
     const botaoEntrar = document.getElementById("btn-entrar");
     const menuUsuario = document.getElementById("user-menu");
     const nomeUsuario = document.getElementById("nome-usuario");
     const botaoMenu = document.getElementById("user-menu-btn");
     const dropdown = document.getElementById("user-dropdown");
     const botaoSair = document.getElementById("btn-sair");
+
+    if (logado) {
+        botaoEntrar && (botaoEntrar.style.display = "none");
+        menuUsuario && (menuUsuario.style.display = "block");
+        const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+        nomeUsuario && (nomeUsuario.textContent = usuario.nome || "Minha conta");
+    } else {
+        localStorage.removeItem("usuario");   // limpa dado velho
+    }
 
     if (usuarioLogado === "true") {
         if (botaoEntrar) {
@@ -61,14 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Encerra a sessão
-    if (botaoSair) {
-        botaoSair.addEventListener("click", function () {
-            localStorage.removeItem("usuarioLogado");
-            localStorage.removeItem("usuario");
-
-            window.location.href = "index.html";
-        });
-    }
+    botaoSair.addEventListener("click", async () => {
+        await apiFetch("/usuarios/logout", { method: "POST" });
+        localStorage.removeItem("usuario");
+        window.location.href = "index.html";
+    });
 });
 // se o arquivo ainda não tiver a função esc, copie; se já tiver, não repita
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>

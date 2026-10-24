@@ -1,6 +1,3 @@
-const API_BASE = "https://portal-infra-backend.onrender.com";
-
-
 
 function mostrarTotal(total) {
   const el = document.getElementById('count-resultados');
@@ -202,13 +199,13 @@ async function enviarResposta(comentarioPaiId, reclamacaoId) {
     if (!texto) return;
 
     try {
-        const resposta = await fetch(`${API_BASE}/comentarios?usuarioId=${usuario.id}&reclamacaoId=${reclamacaoId}`, {
+        const form = new FormData();
+        form.append("texto", texto);
+        form.append("comentarioPaiId", comentarioPaiId);
+
+        const resposta = await apiFetch(`/comentarios?reclamacaoId=${reclamacaoId}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                texto: texto,
-                comentarioPaiId: comentarioPaiId
-            })
+            body: form
         });
 
         if (!resposta.ok) throw new Error("Erro ao salvar resposta");
@@ -246,15 +243,14 @@ async function enviarComentarioPrincipal() {
     if (!texto) return;
 
     try {
-        const resposta = await fetch(`${API_BASE}/comentarios?usuarioId=${usuario.id}&reclamacaoId=${reclamacaoAtualId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                texto: texto,
-                comentarioPaiId: null
-            })
-        });
+        const form = new FormData();
+        form.append("texto", texto);   // comentário raiz: não envie comentarioPaiId
 
+        const resposta = await apiFetch(`/comentarios?reclamacaoId=${reclamacaoAtualId}`, {
+            method: "POST",
+            body: form
+        });
+        
         if (!resposta.ok) throw new Error("Erro ao postar comentário");
 
         campo.value = "";

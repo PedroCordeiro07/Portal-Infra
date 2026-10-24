@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import org.example.portalinfra.config.SessaoUtil;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/comentarios")
@@ -23,12 +25,13 @@ public class ComentarioController {
 
     @PostMapping(consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ComentarioResponse> criar(
-            @RequestParam Long usuarioId,
+            Authentication auth,
             @RequestParam Long reclamacaoId,
             @Valid @ModelAttribute ComentarioRequest request,
-            @RequestPart(value = "foto", required = false) org.springframework.web.multipart.MultipartFile foto
-    ) {
-        ComentarioResponse resposta = comentarioService.criar(usuarioId, reclamacaoId, request, foto);
+            @RequestPart(value = "foto", required = false) org.springframework.web.multipart.MultipartFile foto) {
+
+        ComentarioResponse resposta = comentarioService.criar(
+            SessaoUtil.idLogado(auth), reclamacaoId, request, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
@@ -40,32 +43,31 @@ public class ComentarioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPeloUsuario(
-            @PathVariable Long id,
-            @RequestParam("usuarioId") Long usuarioId) {
-        comentarioService.deletarPeloUsuario(id, usuarioId);
+            @PathVariable Long id, Authentication auth) {
+        comentarioService.deletarPeloUsuario(id, SessaoUtil.idLogado(auth));
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/admin/{id}")
     public ResponseEntity<Void> deletarPeloAdmin(
-            @PathVariable Long id,
-            @RequestParam("adminId") Long adminId) {
-        comentarioService.deletarComentarioPeloAdmin(id, adminId);
+            @PathVariable Long id, Authentication auth) {
+        comentarioService.deletarComentarioPeloAdmin(id, SessaoUtil.idLogado(auth));
         return ResponseEntity.noContent().build();
     }
 
 
+
     @PatchMapping(value = "/{id}", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<org.example.portalinfra.dto.ComentarioResponse> editarComentario(
+    public ResponseEntity<ComentarioResponse> editarComentario(
             @PathVariable Long id,
-            @RequestParam("usuarioId") Long usuarioId,
+            Authentication auth,
             @RequestParam("texto") String novoTexto,
             @RequestParam(value = "isResolucao", required = false) Boolean isResolucao,
             @RequestParam(value = "removerFoto", defaultValue = "false") boolean removerFoto,
             @RequestPart(value = "foto", required = false) org.springframework.web.multipart.MultipartFile novaFoto) {
 
-        var response = comentarioService.editarComentario(id, usuarioId, novoTexto, isResolucao, novaFoto, removerFoto);
-        return org.springframework.http.ResponseEntity.ok(response);
+        return ResponseEntity.ok(comentarioService.editarComentario(
+            id, SessaoUtil.idLogado(auth), novoTexto, isResolucao, novaFoto, removerFoto));
     }
 
 

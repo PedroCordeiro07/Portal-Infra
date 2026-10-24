@@ -40,41 +40,30 @@
       // FUNÇÃO PARA ENVIAR JSON PARA O BACKEND
       // =====================================================
 
+      
       async function postJSON(path, body) {
+          const response = await fetch(API_BASE + path, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              credentials: "include",
+              body: JSON.stringify(body)
+          });
 
-        const response = await fetch(API_BASE + path, {
+          const data = await response.json().catch(() => ({}));
 
-          method: "POST",
+          if (!response.ok) {
+              throw new Error(
+                  data.erro ||
+                  data.message ||
+                  "Erro na requisição"
+              );
+          }
 
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify(body)
-
-        });
-
-
-        // Tenta transformar a resposta em JSON
-        const data = await response.json().catch(() => ({}));
-
-
-        // Se o backend retornar erro
-        if (!response.ok) {
-
-          throw new Error(
-            data.erro ||
-            data.message ||
-            "Erro na requisição"
-          );
-
-        }
-
-
-        // Retorna os dados recebidos do backend
-        return data;
-
+          return data;
       }
+
 
 
       // =====================================================
@@ -116,8 +105,7 @@
               senha: senha
             }
           );
-          localStorage.setItem("usuarioLogado", "true");
-
+          
           localStorage.setItem(
               "usuario",
               JSON.stringify({
@@ -127,6 +115,10 @@
                   tipo: data.tipo
               })
           );
+
+          console.log("Login realizado.");
+          window.location.href = "index.html";
+
 
           console.log("Login realizado:", data);
 

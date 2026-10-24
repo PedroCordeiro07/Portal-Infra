@@ -60,14 +60,16 @@ public class SecurityConfig {
                 ).permitAll()
 
                 // Endpoints públicos de autenticação
-                .requestMatchers(
-                    "/usuarios/login",
-                    "/usuarios/registration",
-                    "/usuarios/enviar-codigo",
-                    "/usuarios/recuperar-senha",
-                    "/usuarios/redefinir-senha",
-                    "/usuarios/config/maps"
-                ).permitAll()
+             .requestMatchers(
+                "/usuarios/login",
+                "/usuarios/registration",
+                "/usuarios/enviar-codigo",
+                "/usuarios/recuperar-senha",
+                "/usuarios/redefinir-senha",
+                "/usuarios/config/maps",
+                "/usuarios/sessao",
+                "/usuarios/logout"
+            ).permitAll()
 
                 // Preflight CORS
                 .requestMatchers(

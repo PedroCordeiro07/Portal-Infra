@@ -18,7 +18,9 @@ async function apiFetch(path, options = {}) {
 async function sessaoAtiva() {
   try {
     const r = await apiFetch("/usuarios/sessao");
-    return r.ok;
+    if (!r.ok) return false;
+    const dados = await r.json();
+    return dados.autenticado === true;
   } catch {
     return false;
   }

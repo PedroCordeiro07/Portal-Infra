@@ -20,7 +20,8 @@ carregarContagem();
 
 
 document.addEventListener("DOMContentLoaded", async function () {
-    const usuarioLogado = await sessaoAtiva();
+    const logado = await sessaoAtiva();
+
     const botaoEntrar = document.getElementById("btn-entrar");
     const menuUsuario = document.getElementById("user-menu");
     const nomeUsuario = document.getElementById("nome-usuario");
@@ -29,30 +30,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     const botaoSair = document.getElementById("btn-sair");
 
     if (logado) {
-        botaoEntrar && (botaoEntrar.style.display = "none");
-        menuUsuario && (menuUsuario.style.display = "block");
+        if (botaoEntrar) botaoEntrar.style.display = "none";
+        if (menuUsuario) menuUsuario.style.display = "block";
+
         const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
-        nomeUsuario && (nomeUsuario.textContent = usuario.nome || "Minha conta");
+        if (nomeUsuario) nomeUsuario.textContent = usuario.nome || "Minha conta";
     } else {
         localStorage.removeItem("usuario");   // limpa dado velho
-    }
-
-    if (usuarioLogado === "true") {
-        if (botaoEntrar) {
-            botaoEntrar.style.display = "none";
-        }
-
-        if (menuUsuario) {
-            menuUsuario.style.display = "block";
-        }
-
-        const usuario = JSON.parse(
-            localStorage.getItem("usuario") || "{}"
-        );
-
-        if (nomeUsuario) {
-            nomeUsuario.textContent = usuario.nome || "Minha conta";
-        }
     }
 
     // Abre e fecha o menu
@@ -73,12 +57,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Encerra a sessão
-    botaoSair.addEventListener("click", async () => {
-        await apiFetch("/usuarios/logout", { method: "POST" });
-        localStorage.removeItem("usuario");
-        window.location.href = "index.html";
-    });
+    if (botaoSair) {
+        botaoSair.addEventListener("click", async () => {
+            await apiFetch("/usuarios/logout", { method: "POST" });
+            localStorage.removeItem("usuario");
+            window.location.href = "index.html";
+        });
+    }
 });
+
 // se o arquivo ainda não tiver a função esc, copie; se já tiver, não repita
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

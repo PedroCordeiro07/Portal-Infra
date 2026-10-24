@@ -325,20 +325,11 @@ public class UsuarioController {
         }
         
         @GetMapping("/sessao")
-        public ResponseEntity<?> verificarSessao(
-                org.springframework.security.core.Authentication authentication) {
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(401)
-                        .body(Map.of("autenticado", false));
+        public ResponseEntity<?> verificarSessao(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof Long id) {
+                return ResponseEntity.ok(Map.of("autenticado", true, "id", id));
         }
-
-        return ResponseEntity.ok(
-                Map.of(
-                        "autenticado", true,
-                        "id", authentication.getPrincipal()
-                )
-        );
+        return ResponseEntity.ok(Map.of("autenticado", false));
         }
 
         @PostMapping("/logout")

@@ -5,6 +5,168 @@ document.addEventListener("DOMContentLoaded", async function () {
     const usuarioLogado = localStorage.getItem("usuarioLogado");
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
+    
+    async function carregarMinhasReclamacoes() {
+        const lista = document.getElementById("listaReclamacoes");
+        const contador = document.getElementById("contadorReclamacoes");
+
+        if (!lista || !contador) return;
+
+        lista.replaceChildren();
+
+        const carregando = document.createElement("p");
+        carregando.textContent = "Carregando suas reclamações...";
+        lista.appendChild(carregando);
+
+        try {
+            const resposta = await apiFetch("/reclamacoes/minhas?page=0&size=10");
+
+            if (!resposta.ok) {
+                if (resposta.status === 401 || resposta.status === 403) {
+                    throw new Error(
+                        "Sua sessão expirou ou você não tem permissão para consultar as reclamações."
+                    );
+                }
+
+                throw new Error("Não foi possível carregar suas reclamações.");
+            }
+
+            const pagina = await resposta.json();
+
+            // O Spring Page retorna os registros dentro de "content".
+            const reclamacoes = pagina.content ?? [];
+
+            contador.textContent =
+                `${pagina.totalElements ?? reclamacoes.length} ${
+                    (pagina.totalElements ?? reclamacoes.length) === 1
+                        ? "reclamação"
+                        : "reclamações"
+                }`;
+
+            lista.replaceChildren();
+
+            if (reclamacoes.length === 0) {
+                const mensagem = document.createElement("p");
+                mensagem.textContent = "Você ainda não registrou reclamações.";
+                lista.appendChild(mensagem);
+                return;
+            }
+
+            reclamacoes.forEach((reclamacao) => {
+                lista.appendChild(criarCardReclamacao(reclamacao));
+            });
+
+        } catch (erro) {
+            console.error("Erro ao carregar minhas reclamações:", erro);
+
+            lista.replaceChildren();
+
+            const mensagem = document.createElement("p");
+            mensagem.textContent =
+                erro.message || "Erro ao carregar suas reclamações.";
+
+            lista.appendChild(mensagem);
+        }
+    }
+
+    function criarCardReclamacao(reclamacao) {
+        const artigo = document.createElement("article");
+        artigo.className = "reclamacao";
+
+        const statusNormalizado = (reclamacao.status || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        let classeIcone = "moderado";
+        let simbolo = "!";
+
+        if (statusNormalizado === "pendente") {
+            classeIcone = "grave"; // Ícone vermelho
+            simbolo = "!";
+        } else if (statusNormalizado === "resolvida") {
+            classeIcone = "leve"; // Ícone verde
+            simbolo = "✓";
+        } else if (statusNormalizado.includes("analise")) {
+            classeIcone = "moderado"; // Ícone amarelo
+            simbolo = "!";
+        }
+
+        const icone = document.createElement("div");
+        icone.className = `icone-reclamacao ${classeIcone}`;
+        icone.textContent = simbolo;
+        icone.setAttribute("aria-hidden", "true");
+
+        const informacoes = document.createElement("div");
+        informacoes.className = "informacoes-reclamacao";
+
+        const titulo = document.createElement("h3");
+        titulo.textContent = reclamacao.titulo || "Reclamação sem título";
+
+        const endereco = document.createElement("p");
+        endereco.textContent = [
+            reclamacao.endereco,
+            reclamacao.bairro,
+            "São Paulo"
+        ].filter(Boolean).join(" - ");
+
+        const data = document.createElement("span");
+        data.className = "data-reclamacao";
+        data.textContent = formatarDataReclamacao(reclamacao.dataCriacao);
+
+        informacoes.append(titulo, endereco, data);
+
+        const status = document.createElement("span");
+        const statusOriginal = reclamacao.status || "Pendente";
+       
+        status.className = "status-reclamacao";
+
+        if (statusNormalizado.includes("resolvida")) {
+            status.classList.add("resolvida");
+        } else if (statusNormalizado.includes("analise")) {
+            status.classList.add("analise");
+        } else {
+            status.classList.add("pendente");
+        }
+
+        status.textContent = statusOriginal;
+
+        const link = document.createElement("a");
+        link.className = "seta";
+        link.href = `reclamacao.html?id=${encodeURIComponent(reclamacao.id)}`;
+        link.textContent = "→";
+        link.setAttribute(
+            "aria-label",
+            `Ver detalhes da reclamação ${reclamacao.titulo || reclamacao.id}`
+        );
+
+        artigo.append(icone, informacoes, status, link);
+
+        return artigo;
+    }
+
+    function formatarDataReclamacao(data) {
+        if (!data) return "Data não informada";
+
+        // Compatível com LocalDateTime retornado pelo Spring.
+        const partes = data.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+        if (partes) {
+            return `Registrada em ${partes[3]}/${partes[2]}/${partes[1]}`;
+        }
+
+        const dataConvertida = new Date(data);
+
+        if (Number.isNaN(dataConvertida.getTime())) {
+            return "Data não informada";
+        }
+
+        return `Registrada em ${dataConvertida.toLocaleDateString("pt-BR")}`;
+    }
+
+    carregarMinhasReclamacoes();
+
+
     if (!(await sessaoAtiva())) {
     window.location.replace("login.html");
     return;   // no perfil.js; no reclamacao.js, veja a nota abaixo

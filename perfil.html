@@ -314,136 +314,45 @@
         <!-- =========================
              MINHAS RECLAMAÇÕES
         ========================== -->
+        
         <section class="card-reclamacoes">
 
             <div class="cabecalho-secao">
-
                 <div>
                     <span class="small-title">MINHAS OCORRÊNCIAS</span>
-
                     <h2>Minhas reclamações</h2>
-
-                    <p>
-                        Acompanhe as reclamações que você registrou.
-                    </p>
+                    <p>Acompanhe as reclamações que você registrou.</p>
                 </div>
 
-                <span class="contador">
-                    3 reclamações
+                <span class="contador" id="contadorReclamacoes">
+                    0 reclamações
                 </span>
+            </div>
+
+            <div
+                class="lista-reclamacoes"
+                id="listaReclamacoes"
+                aria-live="polite">
+
+                <p>Carregando suas reclamações...</p>
 
             </div>
 
-
-            <div class="lista-reclamacoes">
-
-                <!-- RECLAMAÇÃO 1 -->
-                <article class="reclamacao">
-
-                    <div class="icone-reclamacao grave">
-                        !
-                    </div>
-
-                    <div class="informacoes-reclamacao">
-
-                        <h3>Poste sem iluminação</h3>
-
-                        <p>
-                            Rua Exemplo, 120 - São Paulo
-                        </p>
-
-                        <span class="data-reclamacao">
-                            Registrada em 28/09/2026
-                        </span>
-
-                    </div>
-
-                    <span class="status-reclamacao analise">
-                        Em análise
-                    </span>
-
-                    <a href="reclamacao.html" class="seta">
-                        →
-                    </a>
-
-                </article>
-
-
-                <!-- RECLAMAÇÃO 2 -->
-                <article class="reclamacao">
-
-                    <div class="icone-reclamacao moderado">
-                        !
-                    </div>
-
-                    <div class="informacoes-reclamacao">
-
-                        <h3>Buraco na rua</h3>
-
-                        <p>
-                            Avenida São João, 450 - São Paulo
-                        </p>
-
-                        <span class="data-reclamacao">
-                            Registrada em 20/09/2026
-                        </span>
-
-                    </div>
-
-                    <span class="status-reclamacao pendente">
-                        Pendente
-                    </span>
-
-                    <a href="reclamacao.html" class="seta">
-                        →
-                    </a>
-
-                </article>
-
-
-                <!-- RECLAMAÇÃO 3 -->
-                <article class="reclamacao">
-
-                    <div class="icone-reclamacao leve">
-                        ✓
-                    </div>
-
-                    <div class="informacoes-reclamacao">
-
-                        <h3>Árvore caída</h3>
-
-                        <p>
-                            Rua das Flores, 85 - São Paulo
-                        </p>
-
-                        <span class="data-reclamacao">
-                            Registrada em 10/09/2026
-                        </span>
-
-                    </div>
-
-                    <span class="status-reclamacao resolvida">
-                        Resolvida
-                    </span>
-
-                    <a href="reclamacao.html" class="seta">
-                        →
-                    </a>
-
-                </article>
-
-            </div>
-
+            <p
+                id="mensagemReclamacoes"
+                role="status"
+                aria-live="polite"
+                hidden>
+            </p>
 
             <div class="rodape-reclamacoes">
-
                 <a href="reclamacoes.html">
                     Ver todas as reclamações →
                 </a>
-
             </div>
 
         </section>
+
 
     </main>
 

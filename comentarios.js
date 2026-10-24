@@ -32,7 +32,10 @@ function lerFiltros() {
   const p = new URLSearchParams();
   [['titulo', 'filtro-busca'], ['categoria', 'filtro-categoria'],
    ['bairro', 'filtro-bairro'], ['status', 'filtro-status']]
-    .forEach(([nome, id]) => { if (v(id)) p.set(nome, v(id)); });
+    .forEach(([nome, id]) => {
+        const valor = v(id);
+        if (valor && !valor.toLowerCase().startsWith('todos')) p.set(nome, valor);
+    });
   return p;
 }
 

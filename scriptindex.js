@@ -70,7 +70,47 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+// se o arquivo ainda não tiver a função esc, copie; se já tiver, não repita
+const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+function criarItemRecente(r) {
+  const resolvida = (r.status || '').toLowerCase().startsWith('resolvid');
+  const icone = resolvida
+    ? '<div class="resolvidas-gre">OK</div>'
+    : '<div class="red-recl">!</div>';
+  const classe = resolvida ? 'resolved' : 'pending';
+  const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
+
+  return `
+    <article class="complaint">
+      ${icone}
+      <div class="complaint-info">
+        <h3>${esc(r.titulo)}</h3>
+        <p>${esc(r.endereco)} — ${esc(r.bairro)}</p>
+        <span class="date">Registrado em ${data}</span>
+      </div>
+      <span class="status ${classe}">${esc(r.status)}</span>
+      <button class="arrow">→</button>
+    </article>`;
+}
+
+async function carregarRecentes() {
+  const lista = document.getElementById('lista-recentes');
+  if (!lista) return;
+  try {
+    const res = await fetch(`${API_BASE}/reclamacoes?page=0&size=3`);
+    if (!res.ok) return;
+    const pagina = await res.json();
+
+    lista.innerHTML = pagina.content.length === 0
+      ? '<p>Nenhuma reclamação registrada ainda.</p>'
+      : pagina.content.map(criarItemRecente).join('');
+  } catch (e) {
+    console.error('Erro ao carregar últimas reclamações', e);
+  }
+}
+carregarRecentes();
 
 let map;
 

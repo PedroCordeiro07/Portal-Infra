@@ -334,11 +334,17 @@ public class UsuarioController {
 
         @PostMapping("/logout")
         public ResponseEntity<?> logout() {
-        ResponseCookie cookie = ResponseCookie.from("JWT_TOKEN", "")
+        ResponseCookie raiz = ResponseCookie.from("JWT_TOKEN", "")
                 .httpOnly(true).secure(true).sameSite("None")
                 .path("/").maxAge(0).build();
+
+        ResponseCookie antigo = ResponseCookie.from("JWT_TOKEN", "")
+                .httpOnly(true).secure(true).sameSite("None")
+                .path("/usuarios").maxAge(0).build();
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, raiz.toString())
+                .header(HttpHeaders.SET_COOKIE, antigo.toString())
                 .body(Map.of("mensagem", "Sessão encerrada"));
         }
 

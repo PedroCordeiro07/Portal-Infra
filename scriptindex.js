@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const botaoMenu = document.getElementById("user-menu-btn");
     const dropdown = document.getElementById("user-dropdown");
     const botaoSair = document.getElementById("btn-sair");
-
+    
     if (logado) {
         if (botaoEntrar) botaoEntrar.style.display = "none";
         if (menuUsuario) menuUsuario.style.display = "block";
@@ -36,9 +36,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
         if (nomeUsuario) nomeUsuario.textContent = usuario.nome || "Minha conta";
     } else {
-        localStorage.removeItem("usuario");   // limpa dado velho
+        localStorage.removeItem("usuario");
+        if (menuUsuario) menuUsuario.style.display = "none";
+        if (botaoEntrar) botaoEntrar.style.display = "";
     }
-
     // Abre e fecha o menu
     if (botaoMenu && dropdown) {
         botaoMenu.addEventListener("click", function () {

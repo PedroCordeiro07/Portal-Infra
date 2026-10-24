@@ -219,46 +219,62 @@ public class UsuarioService {
     // RECUPERAÇÃO DE SENHA
     // ==========================================
 
-    @Transactional
-    public void gerarTokenRecuperacao(
-            String email
-    ) {
+        @Transactional
+        public void alterarSenha(Long id, String senhaAtual, String novaSenha) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-        email = email.trim().toLowerCase();
+        if (!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
+                throw new RuntimeException("Senha atual incorreta.");
+        }
+        if (passwordEncoder.matches(novaSenha, usuario.getSenha())) {
+                throw new RuntimeException("A nova senha deve ser diferente da atual.");
+        }
 
-        Usuario usuario =
-                usuarioRepository
-                        .findByEmail(email)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Não foi possível realizar a recuperação"
-                                )
-                        );
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+        }
 
-        // Remove tokens antigos.
-        tokenRepository.deleteByUsuario(
-                usuario
-        );
+        @Transactional
+        public void gerarTokenRecuperacao(
+                String email
+        ) {
 
-        String token =
-                UUID.randomUUID().toString();
+                email = email.trim().toLowerCase();
 
-        PasswordResetToken resetToken =
-                new PasswordResetToken(
-                        token,
-                        usuario,
-                        LocalDateTime.now()
-                                .plusMinutes(30)
+                Usuario usuario =
+                        usuarioRepository
+                                .findByEmail(email)
+                                .orElseThrow(() ->
+                                        new RuntimeException(
+                                                "Não foi possível realizar a recuperação"
+                                        )
+                                );
+
+                // Remove tokens antigos.
+                tokenRepository.deleteByUsuario(
+                        usuario
                 );
 
-        tokenRepository.save(resetToken);
+                String token =
+                        UUID.randomUUID().toString();
 
-        // O token vai somente para o e-mail.
-        emailService.enviarEmailRecuperacao(
-                email,
-                token
-        );
-    }
+                PasswordResetToken resetToken =
+                        new PasswordResetToken(
+                                token,
+                                usuario,
+                                LocalDateTime.now()
+                                        .plusMinutes(30)
+                        );
+
+                tokenRepository.save(resetToken);
+
+                // O token vai somente para o e-mail.
+                emailService.enviarEmailRecuperacao(
+                        email,
+                        token
+                );
+        }
 
     // ==========================================
     // REDEFINIR SENHA

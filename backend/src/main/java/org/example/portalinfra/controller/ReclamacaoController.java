@@ -20,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.server.ResponseStatusException;
+import org.example.portalinfra.config.SessaoUtil;
+import org.springframework.security.core.Authentication;
 
 
 @RestController
@@ -34,71 +36,78 @@ public class ReclamacaoController {
         this.reclamacaoRepository = reclamacaoRepository;
     }
 
+    @GetMapping("/contagem")
+    public ResponseEntity<java.util.Map<String, Long>> contagem() {
+        return ResponseEntity.ok(java.util.Map.of(
+            "total", reclamacaoRepository.count(),
+            "pendentes", reclamacaoRepository.countByStatusIgnoreCase("Pendente"),
+            "resolvidas", reclamacaoRepository.countByStatusIgnoreCase("Resolvida")
+        ));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReclamacaoResponse> criar(
-            @Valid @ModelAttribute ReclamacaoRequest dados,
+            @Valid @RequestPart("dados") ReclamacaoRequest dados,
             @RequestPart("foto") MultipartFile foto,
-            @RequestParam("usuarioId") Long usuarioId) {
+            Authentication auth) {
 
         ReclamacaoResponse resposta =
-            reclamacaoService.criar(dados, foto, usuarioId);
-
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(resposta);
+            reclamacaoService.criar(dados, foto, SessaoUtil.idLogado(auth));
+        return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
     @GetMapping
     public ResponseEntity<Page<ReclamacaoResponse>> listarTodas(
+            @RequestParam(value = "titulo", required = false) String titulo,
+            @RequestParam(value = "categoria", required = false) String categoria,
+            @RequestParam(value = "bairro", required = false) String bairro,
+            @RequestParam(value = "status", required = false) String status,
             @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(reclamacaoService.listarTodas(pageable));
+        return ResponseEntity.ok(reclamacaoService.listarTodas(titulo, categoria, bairro, status, pageable));
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<Page<ReclamacaoResponse>> listarPorUsuario(
-            @PathVariable Long usuarioId,
+    
+    @GetMapping("/minhas")
+    public ResponseEntity<Page<ReclamacaoResponse>> listarMinhas(
+            Authentication auth,
             @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(reclamacaoService.listarPorUsuario(usuarioId, pageable));
+        return ResponseEntity.ok(
+            reclamacaoService.listarPorUsuario(SessaoUtil.idLogado(auth), pageable));
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPeloUsuario(
-            @PathVariable Long id,
-            @RequestParam("usuarioId") Long usuarioId) {
-        reclamacaoService.deletarPeloUsuario(id, usuarioId);
+            @PathVariable Long id, Authentication auth) {
+        reclamacaoService.deletarPeloUsuario(id, SessaoUtil.idLogado(auth));
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<Void> deletarPeloAdmin(
+            @PathVariable Long id, Authentication auth) {
+        reclamacaoService.deletarPeloAdmin(id, SessaoUtil.idLogado(auth));
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/admin/{id}")
-    public ResponseEntity<Void> deletarPeloAdmin(
-            @PathVariable Long id,
-            @RequestParam("adminId") Long adminId) {
-        reclamacaoService.deletarPeloAdmin(id, adminId);
-        return ResponseEntity.noContent().build();
-    }
 
 
     @PatchMapping("/admin/{id}/status")
     public ResponseEntity<ReclamacaoResponse> atualizarStatus(
             @PathVariable Long id,
-            @RequestParam("adminId") Long adminId,
+            Authentication auth,
             @RequestBody java.util.Map<String, String> body) {
-
-        ReclamacaoResponse atualizada = reclamacaoService.atualizarStatus(id, body.get("status"), adminId);
-        return ResponseEntity.ok(atualizada);
+        return ResponseEntity.ok(reclamacaoService.atualizarStatus(
+            id, body.get("status"), SessaoUtil.idLogado(auth)));
     }
 
-
-    @PatchMapping(value = "/{id}", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<org.example.portalinfra.dto.ReclamacaoResponse> editarReclamacao(
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ReclamacaoResponse> editarReclamacao(
             @PathVariable Long id,
-            @RequestParam("usuarioId") Long usuarioId,
-            @RequestPart("dados") org.example.portalinfra.dto.ReclamacaoRequest request,
-            @RequestPart(value = "foto", required = false) org.springframework.web.multipart.MultipartFile novaFoto) {
+            Authentication auth,
+            @RequestPart("dados") ReclamacaoRequest request,
+            @RequestPart(value = "foto", required = false) MultipartFile novaFoto) {
 
-        var response = reclamacaoService.editarReclamacao(id, usuarioId, request, novaFoto);
-        return org.springframework.http.ResponseEntity.ok(response);
+        return ResponseEntity.ok(reclamacaoService.editarReclamacao(
+            id, SessaoUtil.idLogado(auth), request, novaFoto));
     }
 
 }

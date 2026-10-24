@@ -207,7 +207,9 @@ nav .active::after {
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
-
+#lista-reclamacoes {
+  display: contents;
+}
 /* =========================
    CARD
 ========================= */

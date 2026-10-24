@@ -12,6 +12,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <script src="api.js" defer></script>
+    <script src="scriptindex.js" defer></script>
   </head>
   <body>
     <!-- CABEÇALHO -->
@@ -79,15 +81,15 @@
           <div class="red-recl">!</div>
           <div>
             <span>Total de reclamações</span>
-            <h2>X VALORES</h2>
+            <h2 id="count-total">-</h2>
           </div>
         </div>
 
         <div class="stat-card">
           <div class="analise-yel">?</div>
           <div>
-            <span>Em análise</span>
-            <h2>X VALORES</h2>
+            <span>Pendentes</span>
+            <h2 id="count-pendentes">-</h2>
           </div>
         </div>
 
@@ -95,7 +97,7 @@
           <div class="resolvidas-gre">OK</div>
           <div>
             <span>Resolvidas</span>
-            <h2>X VALORES</h2>
+            <h2 id="count-resolvidas">-</h2>
           </div>
         </div>
       </section>
@@ -134,41 +136,8 @@
         </div>
 
         <div class="complaint-list">
-          <!-- RECLAMAÇÃO 1 -->
-          <article class="complaint">
-            <div class="red-recl">!</div>
-            <div class="complaint-info">
-              <h3>Buraco na rua</h3>
-              <p>Rua Antônio Carlos — Tatuapé</p>
-              <span class="date">Registrado em 03/09/2026</span>
-            </div>
-            <span class="status pending">Pendente</span>
-            <button class="arrow">→</button>
-          </article>
-
-          <!-- RECLAMAÇÃO 2 -->
-          <article class="complaint">
-            <div class="analise-yel">?</div>
-            <div class="complaint-info">
-              <h3>Poste sem iluminação</h3>
-              <p>Rua das Flores — Itaquera</p>
-              <span class="date">Registrado em 02/09/2026</span>
-            </div>
-            <span class="status analysis">Em análise</span>
-            <button class="arrow">→</button>
-          </article>
-
-          <!-- RECLAMAÇÃO 3 -->
-          <article class="complaint">
-            <div class="resolvidas-gre">OK</div>
-            <div class="complaint-info">
-              <h3>Árvore caída</h3>
-              <p>Rua Vergueiro — Vila Mariana</p>
-              <span class="date">Registrado em 01/09/2026</span>
-            </div>
-            <span class="status resolved">Resolvido</span>
-            <button class="arrow">→</button>
-          </article>
+          <!-- Conteúdo das reclamações inserido pelo JS -->
+           <div class="complaint-list" id="lista-recentes"></div>
         </div>
       </section>
 
@@ -192,6 +161,6 @@
       <span>© 2026 SP em Foco</span>
     </footer>
 
-    <script src="scriptindex.js"></script>
+
   </body>
 </html>

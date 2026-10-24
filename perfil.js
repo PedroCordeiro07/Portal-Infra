@@ -1,13 +1,175 @@
 
-const API_BASE = "https://portal-infra-backend.onrender.com";
+
 
 document.addEventListener("DOMContentLoaded", async function () {
     const usuarioLogado = localStorage.getItem("usuarioLogado");
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
-    if (usuarioLogado !== "true" || !usuario.id) {
-        window.location.href = "login.html";
-        return;
+    
+    async function carregarMinhasReclamacoes() {
+        const lista = document.getElementById("listaReclamacoes");
+        const contador = document.getElementById("contadorReclamacoes");
+
+        if (!lista || !contador) return;
+
+        lista.replaceChildren();
+
+        const carregando = document.createElement("p");
+        carregando.textContent = "Carregando suas reclamações...";
+        lista.appendChild(carregando);
+
+        try {
+            const resposta = await apiFetch("/reclamacoes/minhas?page=0&size=10");
+
+            if (!resposta.ok) {
+                if (resposta.status === 401 || resposta.status === 403) {
+                    throw new Error(
+                        "Sua sessão expirou ou você não tem permissão para consultar as reclamações."
+                    );
+                }
+
+                throw new Error("Não foi possível carregar suas reclamações.");
+            }
+
+            const pagina = await resposta.json();
+
+            // O Spring Page retorna os registros dentro de "content".
+            const reclamacoes = pagina.content ?? [];
+
+            contador.textContent =
+                `${pagina.totalElements ?? reclamacoes.length} ${
+                    (pagina.totalElements ?? reclamacoes.length) === 1
+                        ? "reclamação"
+                        : "reclamações"
+                }`;
+
+            lista.replaceChildren();
+
+            if (reclamacoes.length === 0) {
+                const mensagem = document.createElement("p");
+                mensagem.textContent = "Você ainda não registrou reclamações.";
+                lista.appendChild(mensagem);
+                return;
+            }
+
+            reclamacoes.forEach((reclamacao) => {
+                lista.appendChild(criarCardReclamacao(reclamacao));
+            });
+
+        } catch (erro) {
+            console.error("Erro ao carregar minhas reclamações:", erro);
+
+            lista.replaceChildren();
+
+            const mensagem = document.createElement("p");
+            mensagem.textContent =
+                erro.message || "Erro ao carregar suas reclamações.";
+
+            lista.appendChild(mensagem);
+        }
+    }
+
+    function criarCardReclamacao(reclamacao) {
+        const artigo = document.createElement("article");
+        artigo.className = "reclamacao";
+
+        const statusNormalizado = (reclamacao.status || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        let classeIcone = "moderado";
+        let simbolo = "!";
+
+        if (statusNormalizado === "pendente") {
+            classeIcone = "grave"; // Ícone vermelho
+            simbolo = "!";
+        } else if (statusNormalizado === "resolvida") {
+            classeIcone = "leve"; // Ícone verde
+            simbolo = "✓";
+        } else if (statusNormalizado.includes("analise")) {
+            classeIcone = "moderado"; // Ícone amarelo
+            simbolo = "!";
+        }
+
+        const icone = document.createElement("div");
+        icone.className = `icone-reclamacao ${classeIcone}`;
+        icone.textContent = simbolo;
+        icone.setAttribute("aria-hidden", "true");
+
+        const informacoes = document.createElement("div");
+        informacoes.className = "informacoes-reclamacao";
+
+        const titulo = document.createElement("h3");
+        titulo.textContent = reclamacao.titulo || "Reclamação sem título";
+
+        const endereco = document.createElement("p");
+        endereco.textContent = [
+            reclamacao.endereco,
+            reclamacao.bairro,
+            "São Paulo"
+        ].filter(Boolean).join(" - ");
+
+        const data = document.createElement("span");
+        data.className = "data-reclamacao";
+        data.textContent = formatarDataReclamacao(reclamacao.dataCriacao);
+
+        informacoes.append(titulo, endereco, data);
+
+        const status = document.createElement("span");
+        const statusOriginal = reclamacao.status || "Pendente";
+       
+        status.className = "status-reclamacao";
+
+        if (statusNormalizado.includes("resolvida")) {
+            status.classList.add("resolvida");
+        } else if (statusNormalizado.includes("analise")) {
+            status.classList.add("analise");
+        } else {
+            status.classList.add("pendente");
+        }
+
+        status.textContent = statusOriginal;
+
+        const link = document.createElement("a");
+        link.className = "seta";
+        link.href = `reclamacao.html?id=${encodeURIComponent(reclamacao.id)}`;
+        link.textContent = "→";
+        link.setAttribute(
+            "aria-label",
+            `Ver detalhes da reclamação ${reclamacao.titulo || reclamacao.id}`
+        );
+
+        artigo.append(icone, informacoes, status, link);
+
+        return artigo;
+    }
+
+    function formatarDataReclamacao(data) {
+        if (!data) return "Data não informada";
+
+        // Compatível com LocalDateTime retornado pelo Spring.
+        const partes = data.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+        if (partes) {
+            return `Registrada em ${partes[3]}/${partes[2]}/${partes[1]}`;
+        }
+
+        const dataConvertida = new Date(data);
+
+        if (Number.isNaN(dataConvertida.getTime())) {
+            return "Data não informada";
+        }
+
+        return `Registrada em ${dataConvertida.toLocaleDateString("pt-BR")}`;
+    }
+
+    carregarMinhasReclamacoes();
+
+
+    if (!(await sessaoAtiva())) {
+    window.location.replace("login.html");
+    return;   // no perfil.js; no reclamacao.js, veja a nota abaixo
     }
 
     const formulario = document.getElementById("formularioPerfil");
@@ -76,10 +238,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Carrega os dados atuais do banco.
     try {
-        const resposta = await fetch(
-            `${API_BASE}/usuarios/${usuario.id}`
-        );
-
+        const resposta = await apiFetch("/usuarios/me");
         if (!resposta.ok) {
             throw new Error("Não foi possível carregar seu perfil.");
         }
@@ -152,16 +311,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         botaoSalvar.textContent = "Salvando...";
 
         try {
-            const resposta = await fetch(
-                `${API_BASE}/usuarios/${usuario.id}/perfil`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
+           const resposta = await apiFetch("/usuarios/me/perfil", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
 
             const resultado = await resposta.json().catch(() => ({}));
 
@@ -207,7 +361,157 @@ document.addEventListener("DOMContentLoaded", async function () {
             botaoSalvar.textContent = "Salvar alterações";
         }
     });
+
     
+const botaoAlterarSenha = document.getElementById("botaoAlterarSenha");
+const formularioSenha = document.getElementById("formularioSenha");
+const botaoCancelarSenha = document.getElementById("botaoCancelarSenha");
+const botaoSalvarSenha = document.getElementById("botaoSalvarSenha");
+const mensagemSenha = document.getElementById("mensagemSenha");
+
+function mostrarMensagemSenha(texto, tipo) {
+    mensagemSenha.textContent = texto;
+    mensagemSenha.className = `mensagem-senha ${tipo}`;
+    mensagemSenha.hidden = false;
+}
+
+function limparFormularioSenha() {
+    formularioSenha.reset();
+    mensagemSenha.textContent = "";
+    mensagemSenha.hidden = true;
+    mensagemSenha.className = "mensagem-senha";
+
+    formularioSenha.querySelectorAll("[data-campo-senha]").forEach(botao => {
+        const campo = document.getElementById(botao.dataset.campoSenha);
+        campo.type = "password";
+        botao.textContent = "Mostrar";
+        botao.setAttribute(
+            "aria-label",
+            `Mostrar ${botao.dataset.campoSenha === "senhaAtual"
+                ? "senha atual"
+                : botao.dataset.campoSenha === "novaSenha"
+                    ? "nova senha"
+                    : "confirmação da senha"}`
+        );
+    });
+}
+
+botaoAlterarSenha?.addEventListener("click", () => {
+    const vaiAbrir = formularioSenha.hidden;
+
+    formularioSenha.hidden = !vaiAbrir;
+    botaoAlterarSenha.setAttribute("aria-expanded", String(vaiAbrir));
+
+    if (vaiAbrir) {
+        document.getElementById("senhaAtual").focus();
+    } else {
+        limparFormularioSenha();
+    }
+});
+
+botaoCancelarSenha?.addEventListener("click", () => {
+    limparFormularioSenha();
+    formularioSenha.hidden = true;
+    botaoAlterarSenha.setAttribute("aria-expanded", "false");
+});
+
+formularioSenha?.querySelectorAll("[data-campo-senha]").forEach(botao => {
+    botao.addEventListener("click", () => {
+        const campo = document.getElementById(botao.dataset.campoSenha);
+        const vaiMostrar = campo.type === "password";
+
+        campo.type = vaiMostrar ? "text" : "password";
+        botao.textContent = vaiMostrar ? "Ocultar" : "Mostrar";
+
+        const nomes = {
+            senhaAtual: "senha atual",
+            novaSenha: "nova senha",
+            confirmarSenha: "confirmação da senha"
+        };
+
+        botao.setAttribute(
+            "aria-label",
+            `${vaiMostrar ? "Ocultar" : "Mostrar"} ${nomes[campo.id]}`
+        );
+    });
+});
+
+formularioSenha?.addEventListener("submit", async evento => {
+    evento.preventDefault();
+
+    const senhaAtual = document.getElementById("senhaAtual").value;
+    const novaSenha = document.getElementById("novaSenha").value;
+    const confirmarSenha = document.getElementById("confirmarSenha").value;
+
+    if (novaSenha.length < 6) {
+        mostrarMensagemSenha(
+            "A nova senha deve ter pelo menos 6 caracteres.",
+            "erro"
+        );
+        return;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+        mostrarMensagemSenha(
+            "A confirmação não corresponde à nova senha.",
+            "erro"
+        );
+        return;
+    }
+
+    if (senhaAtual === novaSenha) {
+        mostrarMensagemSenha(
+            "A nova senha deve ser diferente da senha atual.",
+            "erro"
+        );
+        return;
+    }
+
+    botaoSalvarSenha.disabled = true;
+    botaoCancelarSenha.disabled = true;
+    botaoSalvarSenha.textContent = "Salvando...";
+
+    try {
+        const resposta = await apiFetch("/usuarios/me/senha", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                senhaAtual,
+                novaSenha
+            })
+        });
+
+        const resultado = await resposta.json().catch(() => ({}));
+
+        if (!resposta.ok) {
+            throw new Error(
+                resultado.erro || "Não foi possível alterar a senha."
+            );
+        }
+
+        limparFormularioSenha();
+
+        mostrarMensagemSenha(
+            resultado.mensagem || "Senha alterada com sucesso!",
+            "sucesso"
+        );
+
+    } catch (erro) {
+        mostrarMensagemSenha(
+            erro.message || "Ocorreu um erro ao alterar a senha.",
+            "erro"
+        );
+    } finally {
+        botaoSalvarSenha.disabled = false;
+        botaoCancelarSenha.disabled = false;
+        botaoSalvarSenha.textContent = "Salvar nova senha";
+    }
+});
+
+
+
     const botaoExcluirConta = document.getElementById("botaoExcluirConta");
 
     botaoExcluirConta?.addEventListener("click", async function () {
@@ -244,16 +548,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         botaoExcluirConta.textContent = "Desativando...";
 
         try {
-            const resposta = await fetch(
-                `${API_BASE}/usuarios/${usuario.id}/desativar`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ senha })
-                }
-            );
+            const resposta = await apiFetch("/usuarios/me/desativar", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ senha })
+            });
 
             const resultado = await resposta.json().catch(() => ({}));
 

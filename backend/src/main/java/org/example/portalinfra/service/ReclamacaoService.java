@@ -4,6 +4,8 @@ package org.example.portalinfra.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import jakarta.persistence.criteria.Predicate;
+
 import org.example.portalinfra.dto.ReclamacaoRequest;
 import org.example.portalinfra.dto.ReclamacaoResponse;
 import org.example.portalinfra.model.Reclamacao;
@@ -18,15 +20,20 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 
 
@@ -240,9 +247,33 @@ public class ReclamacaoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReclamacaoResponse> listarTodas(Pageable pageable) {
-        return reclamacaoRepository.findAllByOrderByDataCriacaoDesc(pageable)
-                .map(ReclamacaoResponse::de);
+    public Page<ReclamacaoResponse> listarTodas(String titulo, String categoria, String bairro, String status, Pageable pageable) {
+
+        Specification<Reclamacao> spec = (root, query, cb) -> {
+            List<Predicate> filtros = new ArrayList<>();
+
+            if (titulo != null && !titulo.isBlank()) {
+                filtros.add(cb.like(cb.lower(root.get("titulo")), "%" + titulo.trim().toLowerCase() + "%"));
+            }
+            if (categoria != null && !categoria.isBlank()) {
+                filtros.add(cb.equal(root.get("categoria"), categoria));
+            }
+            if (bairro != null && !bairro.isBlank()) {
+                filtros.add(cb.equal(root.get("bairro"), bairro));
+            }
+            if (status != null && !status.isBlank()) {
+                filtros.add(cb.equal(root.get("status"), status));
+            }
+            return cb.and(filtros.toArray(new Predicate[0]));
+        };
+
+        Pageable ordenado = PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by(Sort.Direction.DESC, "dataCriacao").and(Sort.by(Sort.Direction.DESC, "id"))
+        );
+
+        return reclamacaoRepository.findAll(spec, ordenado).map(ReclamacaoResponse::de);
     }
 
     @Transactional(readOnly = true)
@@ -320,7 +351,7 @@ public class ReclamacaoService {
         Reclamacao reclamacao = reclamacaoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reclamação não encontrada."));
 
-        if (!novoStatus.equals("Pendente") && !novoStatus.equals("Em Andamento") && !novoStatus.equals("Resolvido")) {
+        if (!novoStatus.equals("Pendente") && !novoStatus.equals("Resolvida")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status inválido.");
         }
 

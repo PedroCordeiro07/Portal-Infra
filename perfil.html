@@ -9,7 +9,10 @@
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="perfil.css">
+    <script src="api.js" defer></script>
     <script src="perfil.js" defer></script>
+
+
 </head>
 
 <body>
@@ -166,27 +169,126 @@
             </form>
 
 
-            <!-- REDEFINIÇÃO DE SENHA -->
-            <div class="senha-area">
+         
+            <!-- ALTERAÇÃO DE SENHA -->
+            <section class="senha-area" aria-labelledby="tituloSenha">
 
-                <div>
-                    <h3>Senha</h3>
-
+                <div class="senha-descricao">
+                    <h3 id="tituloSenha">Segurança da conta</h3>
                     <p>
-                        Para alterar sua senha, enviaremos um link
-                        de redefinição para seu e-mail.
+                        Altere sua senha para manter sua conta protegida.
+                        Você precisará informar sua senha atual.
                     </p>
                 </div>
 
                 <button
                     type="button"
                     class="btn-secundario"
-                    onclick="redefinirSenha()">
-                    Redefinir senha
+                    id="botaoAlterarSenha"
+                    aria-expanded="false"
+                    aria-controls="formularioSenha">
+                    Alterar senha
                 </button>
 
-            </div>
-  
+                <form id="formularioSenha" class="formulario-senha" hidden>
+
+                    <div class="grupo-senha">
+                        <label for="senhaAtual">Senha atual</label>
+
+                        <div class="campo-senha">
+                            <input
+                                type="password"
+                                id="senhaAtual"
+                                name="senhaAtual"
+                                autocomplete="current-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="botao-visualizar-senha"
+                                data-campo-senha="senhaAtual"
+                                aria-label="Mostrar senha atual">
+                                Mostrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grupo-senha">
+                        <label for="novaSenha">Nova senha</label>
+
+                        <div class="campo-senha">
+                            <input
+                                type="password"
+                                id="novaSenha"
+                                name="novaSenha"
+                                minlength="6"
+                                autocomplete="new-password"
+                                aria-describedby="dicaSenha"
+                                required>
+
+                            <button
+                                type="button"
+                                class="botao-visualizar-senha"
+                                data-campo-senha="novaSenha"
+                                aria-label="Mostrar nova senha">
+                                Mostrar
+                            </button>
+                        </div>
+
+                        <small id="dicaSenha">Use pelo menos 6 caracteres.</small>
+                    </div>
+
+                    <div class="grupo-senha">
+                        <label for="confirmarSenha">Confirmar nova senha</label>
+
+                        <div class="campo-senha">
+                            <input
+                                type="password"
+                                id="confirmarSenha"
+                                name="confirmarSenha"
+                                minlength="6"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="botao-visualizar-senha"
+                                data-campo-senha="confirmarSenha"
+                                aria-label="Mostrar confirmação da senha">
+                                Mostrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <p
+                        id="mensagemSenha"
+                        class="mensagem-senha"
+                        role="status"
+                        aria-live="polite"
+                        hidden>
+                    </p>
+
+                    <div class="acoes-senha">
+                        <button
+                            type="button"
+                            id="botaoCancelarSenha"
+                            class="btn-secundario">
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            id="botaoSalvarSenha"
+                            class="btn-principal">
+                            Salvar nova senha
+                        </button>
+                    </div>
+
+                </form>
+            </section>
+
+            
+            
         <div class="area-excluir-conta">
             <div>
                 <h3>Desativar minha conta</h3>
@@ -212,136 +314,45 @@
         <!-- =========================
              MINHAS RECLAMAÇÕES
         ========================== -->
+        
         <section class="card-reclamacoes">
 
             <div class="cabecalho-secao">
-
                 <div>
                     <span class="small-title">MINHAS OCORRÊNCIAS</span>
-
                     <h2>Minhas reclamações</h2>
-
-                    <p>
-                        Acompanhe as reclamações que você registrou.
-                    </p>
+                    <p>Acompanhe as reclamações que você registrou.</p>
                 </div>
 
-                <span class="contador">
-                    3 reclamações
+                <span class="contador" id="contadorReclamacoes">
+                    0 reclamações
                 </span>
+            </div>
+
+            <div
+                class="lista-reclamacoes"
+                id="listaReclamacoes"
+                aria-live="polite">
+
+                <p>Carregando suas reclamações...</p>
 
             </div>
 
-
-            <div class="lista-reclamacoes">
-
-                <!-- RECLAMAÇÃO 1 -->
-                <article class="reclamacao">
-
-                    <div class="icone-reclamacao grave">
-                        !
-                    </div>
-
-                    <div class="informacoes-reclamacao">
-
-                        <h3>Poste sem iluminação</h3>
-
-                        <p>
-                            Rua Exemplo, 120 - São Paulo
-                        </p>
-
-                        <span class="data-reclamacao">
-                            Registrada em 28/09/2026
-                        </span>
-
-                    </div>
-
-                    <span class="status-reclamacao analise">
-                        Em análise
-                    </span>
-
-                    <a href="reclamacao.html" class="seta">
-                        →
-                    </a>
-
-                </article>
-
-
-                <!-- RECLAMAÇÃO 2 -->
-                <article class="reclamacao">
-
-                    <div class="icone-reclamacao moderado">
-                        !
-                    </div>
-
-                    <div class="informacoes-reclamacao">
-
-                        <h3>Buraco na rua</h3>
-
-                        <p>
-                            Avenida São João, 450 - São Paulo
-                        </p>
-
-                        <span class="data-reclamacao">
-                            Registrada em 20/09/2026
-                        </span>
-
-                    </div>
-
-                    <span class="status-reclamacao pendente">
-                        Pendente
-                    </span>
-
-                    <a href="reclamacao.html" class="seta">
-                        →
-                    </a>
-
-                </article>
-
-
-                <!-- RECLAMAÇÃO 3 -->
-                <article class="reclamacao">
-
-                    <div class="icone-reclamacao leve">
-                        ✓
-                    </div>
-
-                    <div class="informacoes-reclamacao">
-
-                        <h3>Árvore caída</h3>
-
-                        <p>
-                            Rua das Flores, 85 - São Paulo
-                        </p>
-
-                        <span class="data-reclamacao">
-                            Registrada em 10/09/2026
-                        </span>
-
-                    </div>
-
-                    <span class="status-reclamacao resolvida">
-                        Resolvida
-                    </span>
-
-                    <a href="reclamacao.html" class="seta">
-                        →
-                    </a>
-
-                </article>
-
-            </div>
-
+            <p
+                id="mensagemReclamacoes"
+                role="status"
+                aria-live="polite"
+                hidden>
+            </p>
 
             <div class="rodape-reclamacoes">
-
                 <a href="reclamacoes.html">
                     Ver todas as reclamações →
                 </a>
-
             </div>
 
         </section>
+
 
     </main>
 

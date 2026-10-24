@@ -8,7 +8,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface ReclamacaoRepository
         extends JpaRepository<Reclamacao, Long> {
-
+    long countByStatusIgnoreCase(String status);
+    
     Page<Reclamacao> findByUsuarioIdOrderByDataCriacaoDesc(Long usuarioId,  Pageable pageable);
 
     Page<Reclamacao> findAllByOrderByDataCriacaoDesc(Pageable pageable);

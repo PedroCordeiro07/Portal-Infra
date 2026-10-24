@@ -34,6 +34,15 @@ public class ReclamacaoController {
         this.reclamacaoRepository = reclamacaoRepository;
     }
 
+    @GetMapping("/contagem")
+    public ResponseEntity<java.util.Map<String, Long>> contagem() {
+        return ResponseEntity.ok(java.util.Map.of(
+            "total", reclamacaoRepository.count(),
+            "pendentes", reclamacaoRepository.countByStatusIgnoreCase("Pendente"),
+            "resolvidas", reclamacaoRepository.countByStatusIgnoreCase("Resolvida")
+        ));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReclamacaoResponse> criar(
             @Valid @ModelAttribute ReclamacaoRequest dados,

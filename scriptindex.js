@@ -1,3 +1,20 @@
+const API_BASE = "https://portal-infra-backend.onrender.com";
+
+async function carregarContagem() {
+  try {
+    const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
+    if (!res.ok) return;
+    const d = await res.json();
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('count-total', d.total);
+    set('count-pendentes', d.pendentes);
+    set('count-resolvidas', d.resolvidas);
+  } catch (e) {
+    console.error('Erro ao carregar contagem', e);
+  }
+}
+carregarContagem();
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const usuarioLogado = localStorage.getItem("usuarioLogado");

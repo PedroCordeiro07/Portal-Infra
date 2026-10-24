@@ -45,9 +45,9 @@ public class ReclamacaoController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReclamacaoResponse> criar(
-            @Valid @ModelAttribute ReclamacaoRequest dados,
-            @RequestPart("foto") MultipartFile foto,
-            @RequestParam("usuarioId") Long usuarioId) {
+        @Valid @RequestPart("dados") ReclamacaoRequest dados,
+        @RequestPart("foto") MultipartFile foto,
+        @RequestParam("usuarioId") Long usuarioId) {
 
         ReclamacaoResponse resposta =
             reclamacaoService.criar(dados, foto, usuarioId);

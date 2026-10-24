@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/reclamacoes/**").permitAll()
                         .requestMatchers("/comentarios/**").permitAll()
                         .requestMatchers("/denuncias/**").permitAll()
-                 
+                        .requestMatchers("/error").permitAll()
 
                         .anyRequest().authenticated()
                 );

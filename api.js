@@ -16,12 +16,18 @@ async function apiFetch(path, options = {}) {
   return resp;
 }
 async function sessaoAtiva() {
-  try {
-    const r = await apiFetch("/usuarios/sessao");
-    if (!r.ok) return false;
-    const dados = await r.json();
-    return dados.autenticado === true;
-  } catch {
-    return false;
-  }
+    try {
+        const r = await apiFetch("/usuarios/sessao");
+
+        if (!r.ok) {
+            return false;
+        }
+
+        const dados = await r.json();
+
+        return dados.autenticado === true;
+    } catch (erro) {
+        console.error("Erro ao verificar sessão:", erro);
+        return false;
+    }
 }

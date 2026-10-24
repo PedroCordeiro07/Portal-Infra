@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 import org.example.portalinfra.dto.AlterarEmailRequest;
+import org.example.portalinfra.dto.AlterarSenhaRequest;
 import org.example.portalinfra.dto.AlterarTelefoneRequest;
 import org.example.portalinfra.dto.PerfilResponse;
 import org.example.portalinfra.dto.SolicitarTrocaEmailRequest;
@@ -209,35 +210,48 @@ public class UsuarioController {
     // REDEFINIR SENHA
     // ==========================================
 
-    @PostMapping("/redefinir-senha")
-    public ResponseEntity<?> redefinirSenha(
-            @RequestBody Map<String, String> body
-    ) {
-
+        @PatchMapping("/me/senha")
+        public ResponseEntity<?> alterarSenha(
+                Authentication auth,
+                @Valid @RequestBody AlterarSenhaRequest body) {
         try {
-
-            usuarioService.redefinirSenha(
-                    body.get("token"),
-                    body.get("novaSenha")
-            );
-
-            return ResponseEntity.ok(
-                    Map.of(
-                            "mensagem",
-                            "Senha redefinida com sucesso"
-                    )
-            );
-
+                Long id = SessaoUtil.idLogado(auth);
+                usuarioService.alterarSenha(id, body.senhaAtual(), body.novaSenha());
+                return ResponseEntity.ok(Map.of("mensagem", "Senha alterada com sucesso."));
         } catch (RuntimeException e) {
-
-            return ResponseEntity.badRequest().body(
-                    Map.of(
-                            "erro",
-                            e.getMessage()
-                    )
-            );
+                return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
         }
-    }
+        }
+       
+        @PostMapping("/redefinir-senha")
+        public ResponseEntity<?> redefinirSenha(
+                @RequestBody Map<String, String> body
+        ) {
+
+                try {
+
+                usuarioService.redefinirSenha(
+                        body.get("token"),
+                        body.get("novaSenha")
+                );
+
+                return ResponseEntity.ok(
+                        Map.of(
+                                "mensagem",
+                                "Senha redefinida com sucesso"
+                        )
+                );
+
+                } catch (RuntimeException e) {
+
+                return ResponseEntity.badRequest().body(
+                        Map.of(
+                                "erro",
+                                e.getMessage()
+                        )
+                );
+                }
+        }
 
 
     // =============================================

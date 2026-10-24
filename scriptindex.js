@@ -1,8 +1,4 @@
 
-async function sessaoAtiva() {
-  const r = await apiFetch("/usuarios/sessao");
-  return r.ok;
-}
 async function carregarContagem() {
   try {
     const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
@@ -20,15 +16,35 @@ carregarContagem();
 
 
 document.addEventListener("DOMContentLoaded", async function () {
-    const logado = await sessaoAtiva();
 
+
+ 
     const botaoEntrar = document.getElementById("btn-entrar");
     const menuUsuario = document.getElementById("user-menu");
     const nomeUsuario = document.getElementById("nome-usuario");
     const botaoMenu = document.getElementById("user-menu-btn");
     const dropdown = document.getElementById("user-dropdown");
     const botaoSair = document.getElementById("btn-sair");
-    
+
+    function mostrarEstado(logado) {
+        if (logado) {
+            if (botaoEntrar) botaoEntrar.style.display = "none";
+            if (menuUsuario) menuUsuario.style.display = "block";
+
+            const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+            if (nomeUsuario) nomeUsuario.textContent = usuario.nome || "Minha conta";
+        } else {
+            localStorage.removeItem("usuario");
+            if (menuUsuario) menuUsuario.style.display = "none";
+            if (botaoEntrar) botaoEntrar.style.display = "";
+        }
+    }
+
+    mostrarEstado(!!localStorage.getItem("usuario"));
+
+    // 2) Confirma com o servidor e corrige se precisar
+    const logado = await sessaoAtiva();
+    mostrarEstado(logado);
     if (logado) {
         if (botaoEntrar) botaoEntrar.style.display = "none";
         if (menuUsuario) menuUsuario.style.display = "block";

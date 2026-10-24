@@ -59,8 +59,12 @@ public class ReclamacaoController {
 
     @GetMapping
     public ResponseEntity<Page<ReclamacaoResponse>> listarTodas(
+            @RequestParam(value = "titulo", required = false) String titulo,
+            @RequestParam(value = "categoria", required = false) String categoria,
+            @RequestParam(value = "bairro", required = false) String bairro,
+            @RequestParam(value = "status", required = false) String status,
             @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(reclamacaoService.listarTodas(pageable));
+        return ResponseEntity.ok(reclamacaoService.listarTodas(titulo, categoria, bairro, status, pageable));
     }
 
     @GetMapping("/usuario/{usuarioId}")

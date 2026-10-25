@@ -62,7 +62,7 @@ public class SecurityConfig {
                 // Endpoints públicos de autenticação
              .requestMatchers(
                 "/usuarios/login",
-                "/usuarios/registration",
+                "/usuarios/cadastro",
                 "/usuarios/enviar-codigo",
                 "/usuarios/recuperar-senha",
                 "/usuarios/redefinir-senha",

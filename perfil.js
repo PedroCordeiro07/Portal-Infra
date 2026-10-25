@@ -1,21 +1,11 @@
-// =====================================================
-// PROTEÇÃO DA PÁGINA
-// =====================================================
-async function protegerPaginaPerfil() {
-    const logado = await sessaoAtiva();
-    if (!logado) {
-        localStorage.removeItem("usuario");
-        window.location.replace("login.html");
-    }
-}
-protegerPaginaPerfil();
+
 
 
 document.addEventListener("DOMContentLoaded", async function () {
     const usuarioLogado = localStorage.getItem("usuarioLogado");
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
-
+    
     async function carregarMinhasReclamacoes() {
         const lista = document.getElementById("listaReclamacoes");
         const contador = document.getElementById("contadorReclamacoes");
@@ -128,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const status = document.createElement("span");
         const statusOriginal = reclamacao.status || "Pendente";
-
+       
         status.className = "status-reclamacao";
 
         if (statusNormalizado.includes("resolvida")) {
@@ -175,6 +165,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     carregarMinhasReclamacoes();
+
+
+    if (!(await sessaoAtiva())) {
+    window.location.replace("login.html");
+    return;   // no perfil.js; no reclamacao.js, veja a nota abaixo
+    }
 
     const formulario = document.getElementById("formularioPerfil");
     const botaoAlterar = document.getElementById("botaoAlterar");
@@ -285,37 +281,37 @@ document.addEventListener("DOMContentLoaded", async function () {
     formulario.addEventListener("submit", async function (evento) {
         evento.preventDefault();
 
+            
+    function obterValor(id) {
+        const campo = document.getElementById(id);
 
-        function obterValor(id) {
-            const campo = document.getElementById(id);
-
-            if (!campo) {
-                throw new Error(
-                    `Campo com id="${id}" não encontrado no HTML do perfil.`
-                );
-            }
-
-            return campo.value.trim();
+        if (!campo) {
+            throw new Error(
+                `Campo com id="${id}" não encontrado no HTML do perfil.`
+            );
         }
 
-        const payload = {
-            nome: obterValor("nome"),
-            telefone: obterValor("telefone").replace(/\D/g, ""),
-            dataNascimento: obterValor("dataNascimento") || null,
-            cep: obterValor("cep").replace(/\D/g, ""),
-            logradouro: obterValor("logradouro"),
-            numero: obterValor("numero"),
-            complemento: obterValor("complemento"),
-            bairro: obterValor("bairro"),
-            cidade: obterValor("cidade"),
-            uf: obterValor("estado").toUpperCase()
-        };
+        return campo.value.trim();
+    }
+
+    const payload = {
+        nome: obterValor("nome"),
+        telefone: obterValor("telefone").replace(/\D/g, ""),
+        dataNascimento: obterValor("dataNascimento") || null,
+        cep: obterValor("cep").replace(/\D/g, ""),
+        logradouro: obterValor("logradouro"),
+        numero: obterValor("numero"),
+        complemento: obterValor("complemento"),
+        bairro: obterValor("bairro"),
+        cidade: obterValor("cidade"),
+        uf: obterValor("estado").toUpperCase()
+    };
 
         botaoSalvar.disabled = true;
         botaoSalvar.textContent = "Salvando...";
 
         try {
-            const resposta = await apiFetch("/usuarios/me/perfil", {
+           const resposta = await apiFetch("/usuarios/me/perfil", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -366,153 +362,153 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
+    
+const botaoAlterarSenha = document.getElementById("botaoAlterarSenha");
+const formularioSenha = document.getElementById("formularioSenha");
+const botaoCancelarSenha = document.getElementById("botaoCancelarSenha");
+const botaoSalvarSenha = document.getElementById("botaoSalvarSenha");
+const mensagemSenha = document.getElementById("mensagemSenha");
 
-    const botaoAlterarSenha = document.getElementById("botaoAlterarSenha");
-    const formularioSenha = document.getElementById("formularioSenha");
-    const botaoCancelarSenha = document.getElementById("botaoCancelarSenha");
-    const botaoSalvarSenha = document.getElementById("botaoSalvarSenha");
-    const mensagemSenha = document.getElementById("mensagemSenha");
+function mostrarMensagemSenha(texto, tipo) {
+    mensagemSenha.textContent = texto;
+    mensagemSenha.className = `mensagem-senha ${tipo}`;
+    mensagemSenha.hidden = false;
+}
 
-    function mostrarMensagemSenha(texto, tipo) {
-        mensagemSenha.textContent = texto;
-        mensagemSenha.className = `mensagem-senha ${tipo}`;
-        mensagemSenha.hidden = false;
-    }
+function limparFormularioSenha() {
+    formularioSenha.reset();
+    mensagemSenha.textContent = "";
+    mensagemSenha.hidden = true;
+    mensagemSenha.className = "mensagem-senha";
 
-    function limparFormularioSenha() {
-        formularioSenha.reset();
-        mensagemSenha.textContent = "";
-        mensagemSenha.hidden = true;
-        mensagemSenha.className = "mensagem-senha";
-
-        formularioSenha.querySelectorAll("[data-campo-senha]").forEach(botao => {
-            const campo = document.getElementById(botao.dataset.campoSenha);
-            campo.type = "password";
-            botao.textContent = "Mostrar";
-            botao.setAttribute(
-                "aria-label",
-                `Mostrar ${botao.dataset.campoSenha === "senhaAtual"
-                    ? "senha atual"
-                    : botao.dataset.campoSenha === "novaSenha"
-                        ? "nova senha"
-                        : "confirmação da senha"}`
-            );
-        });
-    }
-
-    botaoAlterarSenha?.addEventListener("click", () => {
-        const vaiAbrir = formularioSenha.hidden;
-
-        formularioSenha.hidden = !vaiAbrir;
-        botaoAlterarSenha.setAttribute("aria-expanded", String(vaiAbrir));
-
-        if (vaiAbrir) {
-            document.getElementById("senhaAtual").focus();
-        } else {
-            limparFormularioSenha();
-        }
+    formularioSenha.querySelectorAll("[data-campo-senha]").forEach(botao => {
+        const campo = document.getElementById(botao.dataset.campoSenha);
+        campo.type = "password";
+        botao.textContent = "Mostrar";
+        botao.setAttribute(
+            "aria-label",
+            `Mostrar ${botao.dataset.campoSenha === "senhaAtual"
+                ? "senha atual"
+                : botao.dataset.campoSenha === "novaSenha"
+                    ? "nova senha"
+                    : "confirmação da senha"}`
+        );
     });
+}
 
-    botaoCancelarSenha?.addEventListener("click", () => {
+botaoAlterarSenha?.addEventListener("click", () => {
+    const vaiAbrir = formularioSenha.hidden;
+
+    formularioSenha.hidden = !vaiAbrir;
+    botaoAlterarSenha.setAttribute("aria-expanded", String(vaiAbrir));
+
+    if (vaiAbrir) {
+        document.getElementById("senhaAtual").focus();
+    } else {
         limparFormularioSenha();
-        formularioSenha.hidden = true;
-        botaoAlterarSenha.setAttribute("aria-expanded", "false");
+    }
+});
+
+botaoCancelarSenha?.addEventListener("click", () => {
+    limparFormularioSenha();
+    formularioSenha.hidden = true;
+    botaoAlterarSenha.setAttribute("aria-expanded", "false");
+});
+
+formularioSenha?.querySelectorAll("[data-campo-senha]").forEach(botao => {
+    botao.addEventListener("click", () => {
+        const campo = document.getElementById(botao.dataset.campoSenha);
+        const vaiMostrar = campo.type === "password";
+
+        campo.type = vaiMostrar ? "text" : "password";
+        botao.textContent = vaiMostrar ? "Ocultar" : "Mostrar";
+
+        const nomes = {
+            senhaAtual: "senha atual",
+            novaSenha: "nova senha",
+            confirmarSenha: "confirmação da senha"
+        };
+
+        botao.setAttribute(
+            "aria-label",
+            `${vaiMostrar ? "Ocultar" : "Mostrar"} ${nomes[campo.id]}`
+        );
     });
+});
 
-    formularioSenha?.querySelectorAll("[data-campo-senha]").forEach(botao => {
-        botao.addEventListener("click", () => {
-            const campo = document.getElementById(botao.dataset.campoSenha);
-            const vaiMostrar = campo.type === "password";
+formularioSenha?.addEventListener("submit", async evento => {
+    evento.preventDefault();
 
-            campo.type = vaiMostrar ? "text" : "password";
-            botao.textContent = vaiMostrar ? "Ocultar" : "Mostrar";
+    const senhaAtual = document.getElementById("senhaAtual").value;
+    const novaSenha = document.getElementById("novaSenha").value;
+    const confirmarSenha = document.getElementById("confirmarSenha").value;
 
-            const nomes = {
-                senhaAtual: "senha atual",
-                novaSenha: "nova senha",
-                confirmarSenha: "confirmação da senha"
-            };
+    if (novaSenha.length < 6) {
+        mostrarMensagemSenha(
+            "A nova senha deve ter pelo menos 6 caracteres.",
+            "erro"
+        );
+        return;
+    }
 
-            botao.setAttribute(
-                "aria-label",
-                `${vaiMostrar ? "Ocultar" : "Mostrar"} ${nomes[campo.id]}`
-            );
+    if (novaSenha !== confirmarSenha) {
+        mostrarMensagemSenha(
+            "A confirmação não corresponde à nova senha.",
+            "erro"
+        );
+        return;
+    }
+
+    if (senhaAtual === novaSenha) {
+        mostrarMensagemSenha(
+            "A nova senha deve ser diferente da senha atual.",
+            "erro"
+        );
+        return;
+    }
+
+    botaoSalvarSenha.disabled = true;
+    botaoCancelarSenha.disabled = true;
+    botaoSalvarSenha.textContent = "Salvando...";
+
+    try {
+        const resposta = await apiFetch("/usuarios/me/senha", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                senhaAtual,
+                novaSenha
+            })
         });
-    });
 
-    formularioSenha?.addEventListener("submit", async evento => {
-        evento.preventDefault();
+        const resultado = await resposta.json().catch(() => ({}));
 
-        const senhaAtual = document.getElementById("senhaAtual").value;
-        const novaSenha = document.getElementById("novaSenha").value;
-        const confirmarSenha = document.getElementById("confirmarSenha").value;
-
-        if (novaSenha.length < 6) {
-            mostrarMensagemSenha(
-                "A nova senha deve ter pelo menos 6 caracteres.",
-                "erro"
+        if (!resposta.ok) {
+            throw new Error(
+                resultado.erro || "Não foi possível alterar a senha."
             );
-            return;
         }
 
-        if (novaSenha !== confirmarSenha) {
-            mostrarMensagemSenha(
-                "A confirmação não corresponde à nova senha.",
-                "erro"
-            );
-            return;
-        }
+        limparFormularioSenha();
 
-        if (senhaAtual === novaSenha) {
-            mostrarMensagemSenha(
-                "A nova senha deve ser diferente da senha atual.",
-                "erro"
-            );
-            return;
-        }
+        mostrarMensagemSenha(
+            resultado.mensagem || "Senha alterada com sucesso!",
+            "sucesso"
+        );
 
-        botaoSalvarSenha.disabled = true;
-        botaoCancelarSenha.disabled = true;
-        botaoSalvarSenha.textContent = "Salvando...";
-
-        try {
-            const resposta = await apiFetch("/usuarios/me/senha", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    senhaAtual,
-                    novaSenha
-                })
-            });
-
-            const resultado = await resposta.json().catch(() => ({}));
-
-            if (!resposta.ok) {
-                throw new Error(
-                    resultado.erro || "Não foi possível alterar a senha."
-                );
-            }
-
-            limparFormularioSenha();
-
-            mostrarMensagemSenha(
-                resultado.mensagem || "Senha alterada com sucesso!",
-                "sucesso"
-            );
-
-        } catch (erro) {
-            mostrarMensagemSenha(
-                erro.message || "Ocorreu um erro ao alterar a senha.",
-                "erro"
-            );
-        } finally {
-            botaoSalvarSenha.disabled = false;
-            botaoCancelarSenha.disabled = false;
-            botaoSalvarSenha.textContent = "Salvar nova senha";
-        }
-    });
+    } catch (erro) {
+        mostrarMensagemSenha(
+            erro.message || "Ocorreu um erro ao alterar a senha.",
+            "erro"
+        );
+    } finally {
+        botaoSalvarSenha.disabled = false;
+        botaoCancelarSenha.disabled = false;
+        botaoSalvarSenha.textContent = "Salvar nova senha";
+    }
+});
 
 
 

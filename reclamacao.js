@@ -1,16 +1,26 @@
 // =====================================================
-// PROTEÇÃO DA PÁGINA (Evita piscar)
+// PROTEÇÃO DA PÁGINA (Renderização Instantânea)
 // =====================================================
-async function protegerPaginaNovaReclamacao() {
-    const logado = await sessaoAtiva();
-    if (!logado) {
-        localStorage.removeItem("usuario");
+function protegerPaginaNovaReclamacao() {
+    const usuarioStr = localStorage.getItem("usuario");
+
+    if (!usuarioStr) {
         window.location.replace("login.html");
         return;
     }
 
-    // Libera a tela com um fade suave após confirmar a sessão
-    document.body.classList.add("autorizado");
+    try {
+        const usuario = JSON.parse(usuarioStr);
+        if (!usuario.id) {
+            throw new Error("Sessão inválida");
+        }
+
+        // Libera a tela instantaneamente (sem esperar rede)
+        document.body.classList.add("autorizado");
+    } catch (e) {
+        localStorage.removeItem("usuario");
+        window.location.replace("login.html");
+    }
 }
 
 // Executa a verificação imediatamente

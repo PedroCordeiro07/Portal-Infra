@@ -1,16 +1,15 @@
-
 async function carregarContagem() {
-  try {
-    const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
-    if (!res.ok) return;
-    const d = await res.json();
-    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set('count-total', d.total);
-    set('count-pendentes', d.pendentes);
-    set('count-resolvidas', d.resolvidas);
-  } catch (e) {
-    console.error('Erro ao carregar contagem', e);
-  }
+    try {
+        const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
+        if (!res.ok) return;
+        const d = await res.json();
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('count-total', d.total);
+        set('count-pendentes', d.pendentes);
+        set('count-resolvidas', d.resolvidas);
+    } catch (e) {
+        console.error('Erro ao carregar contagem', e);
+    }
 }
 carregarContagem();
 
@@ -18,7 +17,7 @@ carregarContagem();
 document.addEventListener("DOMContentLoaded", async function () {
 
 
- 
+
     const botaoEntrar = document.getElementById("btn-entrar");
     const menuUsuario = document.getElementById("user-menu");
     const nomeUsuario = document.getElementById("nome-usuario");
@@ -85,17 +84,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 // se o arquivo ainda não tiver a função esc, copie; se já tiver, não repita
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function criarItemRecente(r) {
-  const resolvida = (r.status || '').toLowerCase().startsWith('resolvid');
-  const icone = resolvida
-    ? '<div class="resolvidas-gre">OK</div>'
-    : '<div class="red-recl">!</div>';
-  const classe = resolvida ? 'resolved' : 'pending';
-  const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
+    const resolvida = (r.status || '').toLowerCase().startsWith('resolvid');
+    const icone = resolvida
+        ? '<div class="resolvidas-gre">OK</div>'
+        : '<div class="red-recl">!</div>';
+    const classe = resolvida ? 'resolved' : 'pending';
+    const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
 
-  return `
+    return `
     <article class="complaint">
       ${icone}
       <div class="complaint-info">
@@ -109,19 +108,19 @@ function criarItemRecente(r) {
 }
 
 async function carregarRecentes() {
-  const lista = document.getElementById('lista-recentes');
-  if (!lista) return;
-  try {
-    const res = await fetch(`${API_BASE}/reclamacoes?page=0&size=3`);
-    if (!res.ok) return;
-    const pagina = await res.json();
+    const lista = document.getElementById('lista-recentes');
+    if (!lista) return;
+    try {
+        const res = await fetch(`${API_BASE}/reclamacoes?page=0&size=3`);
+        if (!res.ok) return;
+        const pagina = await res.json();
 
-    lista.innerHTML = pagina.content.length === 0
-      ? '<p>Nenhuma reclamação registrada ainda.</p>'
-      : pagina.content.map(criarItemRecente).join('');
-  } catch (e) {
-    console.error('Erro ao carregar últimas reclamações', e);
-  }
+        lista.innerHTML = pagina.content.length === 0
+            ? '<p>Nenhuma reclamação registrada ainda.</p>'
+            : pagina.content.map(criarItemRecente).join('');
+    } catch (e) {
+        console.error('Erro ao carregar últimas reclamações', e);
+    }
 }
 carregarRecentes();
 
@@ -173,6 +172,5 @@ function initMap() {
         }
     );
 }
-
 
 carregarGoogleMaps();

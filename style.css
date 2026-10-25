@@ -888,3 +888,17 @@ footer .logo span {
   border-color: #cbd5e1;
   transform: translateY(0);
 }
+
+/* =====================================================
+   PROTEÇÃO DE TELA (Evitar Flash de Conteúdo da página reclamações)
+   ===================================================== */
+body[data-protegida="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body[data-protegida="true"].autorizado {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}

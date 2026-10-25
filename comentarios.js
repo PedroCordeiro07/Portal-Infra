@@ -1,63 +1,94 @@
+// =====================================================
+// PROTEÇÃO DA PÁGINA E INICIALIZAÇÃO
+// =====================================================
+async function protegerPaginaReclamacoes() {
+    const logado = await sessaoAtiva();
+    if (!logado) {
+        localStorage.removeItem("usuario");
+        window.location.replace("login.html");
+        return;
+    }
 
+    // Libera a tela com um fade suave após confirmar a sessão
+    document.body.classList.add("autorizado");
+
+    // Se estiver logado, dispara as chamadas iniciais com segurança
+    carregarTotal();
+    carregarReclamacoes();
+}
+
+protegerPaginaReclamacoes();
+
+
+// =====================================================
+// CONTAGEM DE RECLAMAÇÕES
+// =====================================================
 function mostrarTotal(total) {
-  const el = document.getElementById('count-resultados');
-  if (el) el.textContent = `${total.toLocaleString('pt-BR')} ${total === 1 ? 'reclamação' : 'reclamações'}`;
+    const el = document.getElementById('count-resultados');
+    if (el) el.textContent = `${total.toLocaleString('pt-BR')} ${total === 1 ? 'reclamação' : 'reclamações'}`;
 }
 
 async function carregarTotal() {
-  try {
-    const salvo = localStorage.getItem('total_reclamacoes');
-    if (salvo) mostrarTotal(Number(salvo));
-  } catch (e) {}
+    try {
+        const salvo = localStorage.getItem('total_reclamacoes');
+        if (salvo) mostrarTotal(Number(salvo));
+    } catch (e) {}
 
-  try {
-    const res = await fetch(`${API_BASE}/reclamacoes/contagem`);
-    if (!res.ok) return;
-    const d = await res.json();
-    mostrarTotal(d.total);
-    try { localStorage.setItem('total_reclamacoes', d.total); } catch (e) {}
-  } catch (e) {
-    console.error('Erro ao carregar total', e);
-  }
+    try {
+        const res = await apiFetch('/reclamacoes/contagem');
+        if (!res.ok) return;
+        const d = await res.json();
+        mostrarTotal(d.total);
+        try { localStorage.setItem('total_reclamacoes', d.total); } catch (e) {}
+    } catch (e) {
+        console.error('Erro ao carregar total', e);
+    }
 }
-carregarTotal();
 
+
+// =====================================================
+// FILTROS E PESQUISA
+// =====================================================
 let filtroAtual = new URLSearchParams();
 
 function lerFiltros() {
-  const v = (id) => (document.getElementById(id)?.value || '').trim();
-  const p = new URLSearchParams();
-  [['titulo', 'filtro-busca'], ['categoria', 'filtro-categoria'],
-   ['bairro', 'filtro-bairro'], ['status', 'filtro-status']]
-    .forEach(([nome, id]) => {
-        const valor = v(id);
-        if (valor && !valor.toLowerCase().startsWith('todos')) p.set(nome, valor);
-    });
-  return p;
+    const v = (id) => (document.getElementById(id)?.value || '').trim();
+    const p = new URLSearchParams();
+    [['titulo', 'filtro-busca'], ['categoria', 'filtro-categoria'],
+        ['bairro', 'filtro-bairro'], ['status', 'filtro-status']]
+        .forEach(([nome, id]) => {
+            const valor = v(id);
+            if (valor && !valor.toLowerCase().startsWith('todos')) p.set(nome, valor);
+        });
+    return p;
 }
 
 function aplicarFiltro() {
-  filtroAtual = lerFiltros();
-  paginaAtual = 0;
-  const lista = document.getElementById('lista-reclamacoes');
-  if (lista) lista.innerHTML = '';
-  carregarReclamacoes();
+    filtroAtual = lerFiltros();
+    paginaAtual = 0;
+    const lista = document.getElementById('lista-reclamacoes');
+    if (lista) lista.innerHTML = '';
+    carregarReclamacoes();
 }
 
 document.getElementById('btn-filtrar')?.addEventListener('click', aplicarFiltro);
 document.getElementById('filtro-busca')?.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') aplicarFiltro();
+    if (e.key === 'Enter') aplicarFiltro();
 });
 
+
+// =====================================================
+// LISTAGEM DE RECLAMAÇÕES
+// =====================================================
 let paginaAtual = 0;
 
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function criarCard(r) {
-  const classe = { pendente: 'pending', resolvida: 'resolved' }[(r.status || '').toLowerCase()] || '';
-  const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
-  return `
+    const classe = { pendente: 'pending', resolvida: 'resolved' }[(r.status || '').toLowerCase()] || '';
+    const data = r.dataCriacao ? new Date(r.dataCriacao).toLocaleDateString('pt-BR') : '';
+    return `
     <div class="complaint-card">
       <div class="image-container">
         <img src="${esc(r.fotoUrl)}" alt="${esc(r.titulo)}" />
@@ -77,47 +108,46 @@ function criarCard(r) {
 }
 
 async function carregarReclamacoes() {
-  const lista = document.getElementById('lista-reclamacoes');
-  const btn = document.getElementById('btn-mais');
-  const TAMANHO_PAGINA = 12;
-  if (!lista) return;
+    const lista = document.getElementById('lista-reclamacoes');
+    const btn = document.getElementById('btn-mais');
+    const TAMANHO_PAGINA = 12;
+    if (!lista) return;
 
-  try {
-    const params = new URLSearchParams(filtroAtual);
-    params.set('page', paginaAtual);
-    params.set('size', TAMANHO_PAGINA);
+    try {
+        const params = new URLSearchParams(filtroAtual);
+        params.set('page', paginaAtual);
+        params.set('size', TAMANHO_PAGINA);
 
-    const res = await fetch(`${API_BASE}/reclamacoes?${params}`);
-    if (!res.ok) return;
-    const pagina = await res.json();
+        const res = await apiFetch(`/reclamacoes?${params}`);
+        if (!res.ok) return;
+        const pagina = await res.json();
 
-    if (paginaAtual === 0 && pagina.content.length === 0) {
-      lista.innerHTML = '<p>Nenhuma reclamação encontrada.</p>';
-    } else {
-      lista.insertAdjacentHTML('beforeend', pagina.content.map(criarCard).join(''));
+        if (paginaAtual === 0 && pagina.content.length === 0) {
+            lista.innerHTML = '<p>Nenhuma reclamação encontrada.</p>';
+        } else {
+            lista.insertAdjacentHTML('beforeend', pagina.content.map(criarCard).join(''));
+        }
+
+        if (btn) btn.hidden = pagina.content.length < TAMANHO_PAGINA;
+        paginaAtual++;
+    } catch (e) {
+        console.error('Erro ao carregar reclamações', e);
     }
-
-    // opcional: mostra no .results quantas bateram com o filtro
-    // mostrarTotal(pagina.totalElements ?? 0);
-
-    if (btn) btn.hidden = pagina.content.length < TAMANHO_PAGINA;
-    paginaAtual++;
-  } catch (e) {
-    console.error('Erro ao carregar reclamações', e);
-  }
 }
 
 const btnMais = document.getElementById('btn-mais');
 if (btnMais) btnMais.addEventListener('click', carregarReclamacoes);
-carregarReclamacoes();
 
-// Carrega e desenha os comentários de uma reclamação
+
+// =====================================================
+// COMENTÁRIOS E THREADS
+// =====================================================
 async function carregarComentarios(reclamacaoId) {
     const container = document.getElementById("lista-comentarios");
     if (!container) return;
 
     try {
-        const resposta = await fetch(`${API_BASE}/comentarios/reclamacao/${reclamacaoId}`);
+        const resposta = await apiFetch(`/comentarios/reclamacao/${reclamacaoId}`);
         if (!resposta.ok) throw new Error("Erro ao carregar comentários");
 
         const comentarios = await resposta.json();
@@ -137,7 +167,6 @@ async function carregarComentarios(reclamacaoId) {
     }
 }
 
-// Cria o elemento visual de um comentário e suas respostas encadeadas
 function criarElementoComentario(comentario, reclamacaoId) {
     const div = document.createElement("div");
     div.className = "comentario-item";
@@ -155,7 +184,6 @@ function criarElementoComentario(comentario, reclamacaoId) {
         <div class="respostas-container" id="respostas-${comentario.id}"></div>
     `;
 
-    // Se tiver respostas aninhadas (thread estilo Twitter)
     if (comentario.respostas && comentario.respostas.length > 0) {
         const containerRespostas = div.querySelector(`#respostas-${comentario.id}`);
         comentario.respostas.forEach(filho => {
@@ -166,7 +194,6 @@ function criarElementoComentario(comentario, reclamacaoId) {
     return div;
 }
 
-// Abre uma caixinha para responder diretamente àquele comentário
 function mostrarFormularioResposta(comentarioId, reclamacaoId) {
     const caixa = document.getElementById(`caixa-resposta-${comentarioId}`);
     if (!caixa) return;
@@ -186,7 +213,6 @@ function mostrarFormularioResposta(comentarioId, reclamacaoId) {
     `;
 }
 
-// Envia a resposta do comentário para o backend
 async function enviarResposta(comentarioPaiId, reclamacaoId) {
     const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
     if (!usuario.id) {
@@ -210,7 +236,6 @@ async function enviarResposta(comentarioPaiId, reclamacaoId) {
 
         if (!resposta.ok) throw new Error("Erro ao salvar resposta");
 
-        // Recarrega os comentários para já exibir a thread atualizada
         carregarComentarios(reclamacaoId);
     } catch (erro) {
         console.error("Erro:", erro);
@@ -244,13 +269,13 @@ async function enviarComentarioPrincipal() {
 
     try {
         const form = new FormData();
-        form.append("texto", texto);   // comentário raiz: não envie comentarioPaiId
+        form.append("texto", texto);
 
         const resposta = await apiFetch(`/comentarios?reclamacaoId=${reclamacaoAtualId}`, {
             method: "POST",
             body: form
         });
-        
+
         if (!resposta.ok) throw new Error("Erro ao postar comentário");
 
         campo.value = "";
